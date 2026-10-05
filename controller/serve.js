@@ -55,8 +55,8 @@ const serve = {
   },
   //获取评论
   getComment: (req, res, next) => {
-    const pageSize = Number(req.body.pageSize) || 10
-    const pageNum = Number(req.body.pageNum) || 1
+    let pageSize = Number(req.body.pageSize) || 10
+    let pageNum = Number(req.body.pageNum) || 1
     if (pageNum < 1) pageNum = 1
     if (pageSize < 1) pageSize = 10
     if (pageSize > 100) pageSize = 100
@@ -66,8 +66,20 @@ const serve = {
         console.error(err)
         res.status(500).json({ error: '数据库查询错误' })
       } else {
-        const total = Number(countResult.rows[0].total)
-        res.status(200).json({ data: result.rows, total: total, pageSize, pageNum })
+        res.status(200).json({ data: result.rows, pageSize, pageNum })
+      }
+    })
+  },
+  //获取评论总数，总页码让前端自己算
+  getTotalComment: (req, res, next) => {
+    let _sql = 'SELECT COUNT(*) AS total FROM comment;'
+    pool.query(_sql, (err, result) => {
+      if (err) {
+        console.error(err)
+        res.status(500).json({ error: '数据库查询错误' })
+      } else {
+        const total = Number(result.rows[0].total)
+        res.status(200).json({ total: total })
       }
     })
   },

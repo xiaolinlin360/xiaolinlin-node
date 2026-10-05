@@ -33,3 +33,10 @@ export const getComment = (app) => {
     serve.getComment(req, res)
   })
 }
+
+//获取评论总数，总页码让前端自己算
+export const getTotalComment = (app) => {
+  app.post('/getTotalComment', (req, res) => {
+    serve.getTotalComment(req, res)
+  })
+}
