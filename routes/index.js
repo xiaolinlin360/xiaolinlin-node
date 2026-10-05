@@ -47,3 +47,10 @@ export const getMessage = (app) => {
     serve.getMessage(req, res)
   })
 }
+
+//获取私信总数
+export const getTotalMessage = (app) => {
+  app.post('/getTotalMessage', auth, (req, res) => {
+    serve.getTotalMessage(req, res)
+  })
+}

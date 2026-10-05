@@ -40,7 +40,7 @@
 
 //用张三的号，去获取评论
 const token =
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsIm5hbWUiOiLlvKDkuIkiLCJpYXQiOjE3OTEyMDI1ODQsImV4cCI6MTc5MTgwNzM4NH0.VquEapFAsw34A0rpHXg7FBkRDqWJRHSUybiMchAsGRA'
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmFtZSI6IuW8oOS4iSIsImlhdCI6MTc5MTIwMzg0OSwiZXhwIjoxNzkxODA4NjQ5fQ.jO7akibCTV4v-ADhZc9AUBdWVtHTqU8DkdGfOvxFeDY'
 fetch('http://localhost:3001/getComment', {
   method: 'POST',
   headers: {

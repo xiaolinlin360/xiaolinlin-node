@@ -4,7 +4,7 @@ const serve = {
   //查询是否注册
   isRegistered: (req, res, next) => {
     let _sql = 'SELECT * FROM users WHERE id = $1;'
-    pool.query(_sql, [req.body.userId], (err, result) => {
+    pool.query(_sql, [req.body.id], (err, result) => {
       if (err) {
         console.error(err)
         res.status(500).json({ error: '数据库查询错误' })
@@ -45,6 +45,7 @@ const serve = {
       } else {
         if (result.rows.length > 0) {
           const user = result.rows[0]
+          // 生成token
           const token = generateToken(user.id, user.name)
           res.status(200).json({ message: '登录成功', token: token })
         } else {
@@ -74,6 +75,35 @@ const serve = {
   getTotalComment: (req, res, next) => {
     let _sql = 'SELECT COUNT(*) AS total FROM comment;'
     pool.query(_sql, (err, result) => {
+      if (err) {
+        console.error(err)
+        res.status(500).json({ error: '数据库查询错误' })
+      } else {
+        const total = Number(result.rows[0].total)
+        res.status(200).json({ total: total })
+      }
+    })
+  },
+  //获取私信message
+  getMessage: (req, res, next) => {
+    // 用token中的id查询
+    const user = verifyToken(req.body.token)
+    let _sql = 'SELECT * FROM message WHERE user_id = $1 ORDER BY id DESC;'
+    pool.query(_sql, [user.id], (err, result) => {
+      if (err) {
+        console.error(err)
+        res.status(500).json({ error: '数据库查询错误' })
+      } else {
+        res.status(200).json({ data: result.rows })
+      }
+    })
+  },
+  //获取私信总数
+  getTotalMessage: (req, res, next) => {
+    // 用token中的id查询
+    const user = verifyToken(req.body.token)
+    let _sql = 'SELECT COUNT(*) AS total FROM message WHERE user_id = $1;'
+    pool.query(_sql, [user.id], (err, result) => {
       if (err) {
         console.error(err)
         res.status(500).json({ error: '数据库查询错误' })
