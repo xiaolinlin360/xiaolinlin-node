@@ -37,8 +37,8 @@ const serve = {
   //登录
   login: (req, res, next) => {
     const data = req.body
-    let _sql = 'SELECT * FROM users WHERE id = $1 AND password = $2;'
-    pool.query(_sql, [data.id, data.password], (err, result) => {
+    let _sql = 'SELECT * FROM users WHERE name = $1 AND password = $2;'
+    pool.query(_sql, [data.name, data.password], (err, result) => {
       if (err) {
         console.error(err)
         res.status(500).json({ error: '数据库查询错误' })

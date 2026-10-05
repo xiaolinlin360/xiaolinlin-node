@@ -22,3 +22,36 @@
 //   .then((res) => res.json())
 //   .then((json) => console.log(json))
 //   .catch((err) => console.error(err))
+
+//用张三的号去登录
+// fetch('http://localhost:3001/login', {
+//   method: 'POST',
+//   headers: {
+//     'Content-Type': 'application/json',
+//   },
+//   body: JSON.stringify({
+//     name: '张三',
+//     password: '123456',
+//   }),
+// })
+//   .then((res) => res.json())
+//   .then((json) => console.log(json))
+//   .catch((err) => console.error(err))
+
+//用张三的号，去获取评论
+const token =
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsIm5hbWUiOiLlvKDkuIkiLCJpYXQiOjE3OTEyMDI1ODQsImV4cCI6MTc5MTgwNzM4NH0.VquEapFAsw34A0rpHXg7FBkRDqWJRHSUybiMchAsGRA'
+fetch('http://localhost:3001/getComment', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    Authorization: `Bearer ${token}`,
+  },
+  body: JSON.stringify({
+    pageSize: 10,
+    pageNum: 1,
+  }),
+})
+  .then((res) => res.json())
+  .then((json) => console.log(json))
+  .catch((err) => console.error(err))

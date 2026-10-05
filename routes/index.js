@@ -29,14 +29,21 @@ export const login = (app) => {
 
 //获取评论
 export const getComment = (app) => {
-  app.post('/getComment', (req, res) => {
+  app.post('/getComment', auth, (req, res) => {
     serve.getComment(req, res)
   })
 }
 
 //获取评论总数，总页码让前端自己算
 export const getTotalComment = (app) => {
-  app.post('/getTotalComment', (req, res) => {
+  app.post('/getTotalComment', auth, (req, res) => {
     serve.getTotalComment(req, res)
+  })
+}
+
+//获取私信message
+export const getMessage = (app) => {
+  app.post('/getMessage', auth, (req, res) => {
+    serve.getMessage(req, res)
   })
 }
