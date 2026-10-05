@@ -26,3 +26,10 @@ export const login = (app) => {
     serve.login(req, res)
   })
 }
+
+//获取评论
+export const getComment = (app) => {
+  app.post('/getComment', (req, res) => {
+    serve.getComment(req, res)
+  })
+}

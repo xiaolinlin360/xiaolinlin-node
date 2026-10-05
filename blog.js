@@ -1,7 +1,7 @@
 import { config } from './config/default.js'
 import express from 'express'
 import cors from 'cors'
-import { hi, isRegistered, insertUser, login } from './routes/index.js'
+import { hi, isRegistered, insertUser, login, getComment } from './routes/index.js'
 import { create } from './model/db.js'
 create()
 const app = express()
@@ -27,6 +27,7 @@ hi(app) // 调用路由函数，传入 app 实例
 isRegistered(app)
 insertUser(app)
 login(app)
+getComment(app)
 
 app.listen(port, () => {
   console.log(`服务器启动成功，监听端口：${port}`)

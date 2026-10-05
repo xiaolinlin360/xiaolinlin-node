@@ -53,5 +53,23 @@ const serve = {
       }
     })
   },
+  //获取评论
+  getComment: (req, res, next) => {
+    const pageSize = Number(req.body.pageSize) || 10
+    const pageNum = Number(req.body.pageNum) || 1
+    if (pageNum < 1) pageNum = 1
+    if (pageSize < 1) pageSize = 10
+    if (pageSize > 100) pageSize = 100
+    let _sql = 'SELECT * FROM comment ORDER BY id LIMIT $1 OFFSET $2;'
+    pool.query(_sql, [pageSize, (pageNum - 1) * pageSize], (err, result) => {
+      if (err) {
+        console.error(err)
+        res.status(500).json({ error: '数据库查询错误' })
+      } else {
+        const total = Number(countResult.rows[0].total)
+        res.status(200).json({ data: result.rows, total: total, pageSize, pageNum })
+      }
+    })
+  },
 }
 export default serve
