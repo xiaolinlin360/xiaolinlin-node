@@ -21,7 +21,7 @@ const serve = {
   insertUser: (req, res, next) => {
     const data = req.body
     let _sql = 'INSERT INTO users (id, name,mail,password) VALUES ($1, $2,$3,$4) RETURNING *;'
-    pool.query(_sql, [data.userId, data.userName, data.mail, data.password], (err, result) => {
+    pool.query(_sql, [data.id, data.name, data.mail, data.password], (err, result) => {
       if (err) {
         console.error(err)
         res.status(500).json({ error: '数据库插入错误' })
@@ -38,7 +38,7 @@ const serve = {
   login: (req, res, next) => {
     const data = req.body
     let _sql = 'SELECT * FROM users WHERE id = $1 AND password = $2;'
-    pool.query(_sql, [data.userId, data.password], (err, result) => {
+    pool.query(_sql, [data.id, data.password], (err, result) => {
       if (err) {
         console.error(err)
         res.status(500).json({ error: '数据库查询错误' })

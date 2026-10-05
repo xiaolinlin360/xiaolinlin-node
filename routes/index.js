@@ -1,8 +1,9 @@
 import serve from '../controller/serve.js'
+import { auth } from '../lib/auth.js'
 
 //req 请求对象，res 响应对象，next 中间件函数
 export const hi = (app) => {
-  app.get('/', (req, res) => {
+  app.get('/', auth, (req, res) => {
     res.send('Hello World!')
   })
 }
