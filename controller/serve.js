@@ -1,0 +1,57 @@
+import pool from '../model/db.js'
+import { generateToken, verifyToken } from '../lib/jwt.js'
+const serve = {
+  //查询是否注册
+  isRegistered: (req, res, next) => {
+    let _sql = 'SELECT * FROM users WHERE id = $1;'
+    pool.query(_sql, [req.body.userId], (err, result) => {
+      if (err) {
+        console.error(err)
+        res.status(500).json({ error: '数据库查询错误' })
+      }
+      if (result.rows.length > 0) {
+        console.log(result)
+        res.status(200).json({ users: result.rows })
+      } else {
+        res.status(200).json({ registered: false })
+      }
+    })
+  },
+  //注册用户
+  insertUser: (req, res, next) => {
+    const data = req.body
+    let _sql = 'INSERT INTO users (id, name,mail,password) VALUES ($1, $2,$3,$4) RETURNING *;'
+    pool.query(_sql, [data.userId, data.userName, data.mail, data.password], (err, result) => {
+      if (err) {
+        console.error(err)
+        res.status(500).json({ error: '数据库插入错误' })
+      } else {
+        const user = result.rows[0]
+        res.status(200).json({
+          message: '用户注册成功',
+          user: { id: user.id, name: user.name, mail: user.mail },
+        })
+      }
+    })
+  },
+  //登录
+  login: (req, res, next) => {
+    const data = req.body
+    let _sql = 'SELECT * FROM users WHERE id = $1 AND password = $2;'
+    pool.query(_sql, [data.userId, data.password], (err, result) => {
+      if (err) {
+        console.error(err)
+        res.status(500).json({ error: '数据库查询错误' })
+      } else {
+        if (result.rows.length > 0) {
+          const user = result.rows[0]
+          const token = generateToken(user.id, user.name)
+          res.status(200).json({ message: '登录成功', token: token })
+        } else {
+          res.status(401).json({ message: '登录失败' })
+        }
+      }
+    })
+  },
+}
+export default serve
