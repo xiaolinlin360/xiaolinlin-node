@@ -165,6 +165,10 @@ const serve = {
   updateArticleStatus: (req, res, next) => {
     const data = req.body
     const user = req.user.id
+    // 文章状态0：草稿，1：已发布
+    if (data.is_complained !== 0 && data.is_complained !== 1) {
+      return res.status(400).json({ message: '发布状态参数错误' })
+    }
     let _sql = 'UPDATE article SET is_complained = $1 WHERE id = $2;'
     pool.query(_sql, [data.is_complained, user], (err, result) => {
       if (err) {
@@ -194,6 +198,21 @@ const serve = {
         } else {
           res.status(404).json({ message: '文章不存在或已被删除' })
         }
+      }
+    })
+  },
+  //获取分组(单个人的博客，只有单个人的分组所以直接拿到表)
+  getSubset: (req, res, next) => {
+    let data = []
+    if (req.body?.classif) data.push(req.body?.classif)
+    let _sql = 'SELECT * FROM subset WHERE classif = $1;'
+    if (data.length === 0) _sql = 'SELECT * FROM subset;'
+    pool.query(_sql, data, (err, result) => {
+      if (err) {
+        console.error(err)
+        res.status(500).json({ error: '数据库查询错误' })
+      } else {
+        res.status(200).json({ data: result.rows })
       }
     })
   },

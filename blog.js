@@ -15,6 +15,7 @@ import {
   getTotalArticle,
   updateArticleStatus,
   deleteArticle,
+  getSubset,
 } from './routes/index.js'
 import { create } from './model/db.js'
 create()
@@ -50,6 +51,7 @@ getArticle(app)
 getTotalArticle(app)
 updateArticleStatus(app)
 deleteArticle(app)
+getSubset(app)
 app.listen(port, () => {
   console.log(`服务器启动成功，监听端口：${port}`)
 })

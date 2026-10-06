@@ -89,3 +89,10 @@ export const deleteArticle = (app) => {
     serve.deleteArticle(req, res)
   })
 }
+
+//获取分组
+export const getSubset = (app) => {
+  app.post('/getSubset', auth, (req, res) => {
+    serve.getSubset(req, res)
+  })
+}
