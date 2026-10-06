@@ -23,6 +23,9 @@ import {
   insertLabel,
   updateLabel,
   deleteLabel,
+  getFile,
+  getTotalFile,
+  moveFile,
 } from './routes/index.js'
 import { create } from './model/db.js'
 create()
@@ -66,6 +69,9 @@ getLabel(app)
 insertLabel(app)
 updateLabel(app)
 deleteLabel(app)
+getFile(app)
+getTotalFile(app)
+moveFile(app)
 app.listen(port, () => {
   console.log(`服务器启动成功，监听端口：${port}`)
 })

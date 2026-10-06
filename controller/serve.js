@@ -138,6 +138,9 @@ const serve = {
   },
   //获取文章
   getArticle: (req, res, next) => {
+    const data = req.body
+    const pageSize = data.pageSize || 10
+    const pageNum = data.pageNum || 0
     let _sql = 'SELECT * FROM article ORDER BY id LIMIT $1 OFFSET $2;'
     pool.query(_sql, [pageSize, (pageNum - 1) * pageSize], (err, result) => {
       if (err) {
@@ -333,6 +336,68 @@ const serve = {
           res.status(200).json({ message: '标签名字更新成功' })
         } else {
           res.status(404).json({ message: '标签不存在或已被更新' })
+        }
+      }
+    })
+  },
+  //删除标签
+  deleteLabel: (req, res, next) => {
+    const data = req.body
+    const user = req.user.id
+    let _sql = 'DELETE FROM label WHERE id = $1 and user_id = $2;'
+    pool.query(_sql, [data.id, user], (err, result) => {
+      if (err) {
+        console.error(err)
+        res.status(500).json({ error: '数据库删除错误' })
+      } else {
+        if (result.rowCount > 0) {
+          res.status(200).json({ message: '标签删除成功' })
+        } else {
+          res.status(404).json({ message: '标签不存在或已被删除' })
+        }
+      }
+    })
+  },
+  //获取文件（分页查询）
+  getFile: (req, res, next) => {
+    const pageSize = req.body.pageSize || 10
+    const pageNum = req.body.pageNum || 0
+    let _sql = 'SELECT * FROM file ORDER BY id DESC LIMIT $1 OFFSET $2;'
+    pool.query(_sql, [pageSize, (pageNum - 1) * pageSize], (err, result) => {
+      if (err) {
+        console.error(err)
+        res.status(500).json({ error: '数据库查询错误' })
+      } else {
+        res.status(200).json({ data: result.rows })
+      }
+    })
+  },
+  //获取文件总数（后面需要微调，还有文件分类那些都没写）
+  getTotalFile: (req, res, next) => {
+    let _sql = 'SELECT COUNT(*) FROM file;'
+    pool.query(_sql, (err, result) => {
+      if (err) {
+        console.error(err)
+        res.status(500).json({ error: '数据库查询错误' })
+      } else {
+        res.status(200).json({ data: result.rows[0].count })
+      }
+    })
+  },
+  //文件删除和修改后面在做吧
+  //移动文件到不同的分类（修改subset id）
+  moveFile: (req, res, next) => {
+    const data = req.body
+    let _sql = 'UPDATE file SET subset_id = $1 WHERE id = $2;'
+    pool.query(_sql, [data.subset_id, data.id], (err, result) => {
+      if (err) {
+        console.error(err)
+        res.status(500).json({ error: '数据库更新错误' })
+      } else {
+        if (result.rowCount > 0) {
+          res.status(200).json({ message: '文件移动成功' })
+        } else {
+          res.status(404).json({ message: '文件不存在或已被移动' })
         }
       }
     })
