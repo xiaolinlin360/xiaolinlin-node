@@ -54,3 +54,10 @@ export const getTotalMessage = (app) => {
     serve.getTotalMessage(req, res)
   })
 }
+
+//将某一条私信标记为已读
+export const readMessage = (app) => {
+  app.post('/readMessage', auth, (req, res) => {
+    serve.readMessage(req, res)
+  })
+}

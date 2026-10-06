@@ -75,18 +75,15 @@ const dbTables = {
 
   // 评论表（表名 comment 是 PostgreSQL 关键字，必须加双引号）
   comment: `
-        CREATE TABLE IF NOT EXISTS "comment" (
-            id SERIAL PRIMARY KEY,
-            user_id VARCHAR(100) NOT NULL,
-            user_type INT NOT NULL,
-            user_name VARCHAR(100),
-            article_id INT NOT NULL,
-            content VARCHAR(1000) NOT NULL,
-            complaint INT DEFAULT 0,
-            isread INT DEFAULT 0,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        );
+       CREATE TABLE IF NOT EXISTS comment (
+        id SERIAL PRIMARY KEY,
+        article_id INT NOT NULL,              -- 关联的文章ID
+        user_id INT NOT NULL,                 -- 评论者ID（类型改为INT）
+        content VARCHAR(1000) NOT NULL,       -- 评论内容
+        is_complained INT DEFAULT 0,          -- 是否被投诉（0否，1是）
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
     `,
 
   // 标签表
@@ -122,19 +119,19 @@ const dbTables = {
         );
     `,
 
-  // 消息表
+  // 私信表
   message: `
-        CREATE TABLE IF NOT EXISTS message (
-            id SERIAL PRIMARY KEY,
-            user_id VARCHAR(100) NOT NULL,
-            user_type INT NOT NULL,
-            user_name VARCHAR(100),
-            content VARCHAR(1000) NOT NULL,
-            isread INT DEFAULT 0,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        );
-    `,
+    CREATE TABLE IF NOT EXISTS message (
+        id SERIAL PRIMARY KEY,
+        sender_id INT NOT NULL,               -- 发送者ID（原缺失的字段，改为INT保证与users.id类型一致）
+        user_id INT NOT NULL,                 -- 接收者ID
+        user_type INT DEFAULT 1,               -- 消息类型（原user_type，建议改名msg_type????!!!!!。1=用户私信，0=系统通知，按需调整）
+        content VARCHAR(1000) NOT NULL,       -- 消息内容
+        isread INT DEFAULT 0,                 -- 是否已读：0未读，1已读
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+`,
 
   // 记录表
   record: `

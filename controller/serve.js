@@ -54,7 +54,7 @@ const serve = {
       }
     })
   },
-  //获取评论
+  //获取评论（全查询，无论是系统通知还是用户的评论）
   getComment: (req, res, next) => {
     let pageSize = Number(req.body.pageSize) || 10
     let pageNum = Number(req.body.pageNum) || 1
@@ -87,29 +87,50 @@ const serve = {
   //获取私信message
   getMessage: (req, res, next) => {
     // 用token中的id查询
-    const user = verifyToken(req.body.token)
-    let _sql = 'SELECT * FROM message WHERE user_id = $1 ORDER BY id DESC;'
-    pool.query(_sql, [user.id], (err, result) => {
+
+    let pageSize = Number(req.body.pageSize) || 10
+    let pageNum = Number(req.body.pageNum) || 1
+    if (pageNum < 1) pageNum = 1
+    if (pageSize < 1) pageSize = 10
+    if (pageSize > 100) pageSize = 100
+    let _sql = 'SELECT * FROM message ORDER BY id LIMIT $1 OFFSET $2;'
+    pool.query(_sql, [pageSize, (pageNum - 1) * pageSize], (err, result) => {
       if (err) {
         console.error(err)
         res.status(500).json({ error: '数据库查询错误' })
       } else {
-        res.status(200).json({ data: result.rows })
+        res.status(200).json({ data: result.rows, pageSize, pageNum })
       }
     })
   },
   //获取私信总数
   getTotalMessage: (req, res, next) => {
     // 用token中的id查询
-    const user = verifyToken(req.body.token)
-    let _sql = 'SELECT COUNT(*) AS total FROM message WHERE user_id = $1;'
-    pool.query(_sql, [user.id], (err, result) => {
+    let _sql = 'SELECT COUNT(*) AS total FROM message;'
+    pool.query(_sql, (err, result) => {
       if (err) {
         console.error(err)
         res.status(500).json({ error: '数据库查询错误' })
       } else {
         const total = Number(result.rows[0].total)
         res.status(200).json({ total: total })
+      }
+    })
+  },
+  //将某一条私信标记为已读
+  readMessage: (req, res, next) => {
+    const data = req.body
+    let _sql = 'UPDATE message SET isread = 1 WHERE id = $1 ;'
+    pool.query(_sql, [data.id], (err, result) => {
+      if (err) {
+        console.error(err)
+        res.status(500).json({ error: '数据库更新错误' })
+      } else {
+        if (result.rowCount > 0) {
+          res.status(200).json({ message: '私信标记为已读成功' })
+        } else {
+          res.status(404).json({ message: '私信不存在或已被标记' })
+        }
       }
     })
   },

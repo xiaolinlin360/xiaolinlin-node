@@ -10,6 +10,7 @@ import {
   getTotalComment,
   getMessage,
   getTotalMessage,
+  readMessage,
 } from './routes/index.js'
 import { create } from './model/db.js'
 create()
@@ -40,6 +41,7 @@ getComment(app)
 getTotalComment(app)
 getMessage(app)
 getTotalMessage(app)
+readMessage(app)
 app.listen(port, () => {
   console.log(`服务器启动成功，监听端口：${port}`)
 })
