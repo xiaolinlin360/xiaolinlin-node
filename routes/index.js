@@ -75,3 +75,17 @@ export const getTotalArticle = (app) => {
     serve.getTotalArticle(req, res)
   })
 }
+
+//修改文章的发布状态
+export const updateArticleStatus = (app) => {
+  app.post('/updateArticleStatus', auth, (req, res) => {
+    serve.updateArticleStatus(req, res)
+  })
+}
+
+//删除文章
+export const deleteArticle = (app) => {
+  app.post('/deleteArticle', auth, (req, res) => {
+    serve.deleteArticle(req, res)
+  })
+}

@@ -87,14 +87,14 @@ const serve = {
   //获取私信message
   getMessage: (req, res, next) => {
     // 用token中的id查询
-
+    const user = req.user.id
     let pageSize = Number(req.body.pageSize) || 10
     let pageNum = Number(req.body.pageNum) || 1
     if (pageNum < 1) pageNum = 1
     if (pageSize < 1) pageSize = 10
     if (pageSize > 100) pageSize = 100
-    let _sql = 'SELECT * FROM message ORDER BY id LIMIT $1 OFFSET $2;'
-    pool.query(_sql, [pageSize, (pageNum - 1) * pageSize], (err, result) => {
+    let _sql = 'SELECT * FROM message WHERE user_id = $1 ORDER BY id LIMIT $2 OFFSET $3;'
+    pool.query(_sql, [user, pageSize, (pageNum - 1) * pageSize], (err, result) => {
       if (err) {
         console.error(err)
         res.status(500).json({ error: '数据库查询错误' })
@@ -106,8 +106,9 @@ const serve = {
   //获取私信总数
   getTotalMessage: (req, res, next) => {
     // 用token中的id查询
-    let _sql = 'SELECT COUNT(*) AS total FROM message;'
-    pool.query(_sql, (err, result) => {
+    const user = req.user.id
+    let _sql = 'SELECT COUNT(*) AS total FROM message WHERE user_id = $1;'
+    pool.query(_sql, [user], (err, result) => {
       if (err) {
         console.error(err)
         res.status(500).json({ error: '数据库查询错误' })
@@ -120,8 +121,9 @@ const serve = {
   //将某一条私信标记为已读
   readMessage: (req, res, next) => {
     const data = req.body
-    let _sql = 'UPDATE message SET isread = 1 WHERE id = $1 ;'
-    pool.query(_sql, [data.id], (err, result) => {
+    const user = req.user.id
+    let _sql = 'UPDATE message SET isread = 1 WHERE id = $1 and user_id = $2;'
+    pool.query(_sql, [data.id, user], (err, result) => {
       if (err) {
         console.error(err)
         res.status(500).json({ error: '数据库更新错误' })
@@ -156,6 +158,42 @@ const serve = {
       } else {
         const total = Number(result.rows[0].total)
         res.status(200).json({ total: total })
+      }
+    })
+  },
+  //修改文章的发布状态
+  updateArticleStatus: (req, res, next) => {
+    const data = req.body
+    const user = req.user.id
+    let _sql = 'UPDATE article SET is_complained = $1 WHERE id = $2;'
+    pool.query(_sql, [data.is_complained, user], (err, result) => {
+      if (err) {
+        console.error(err)
+        res.status(500).json({ error: '数据库更新错误' })
+      } else {
+        if (result.rowCount > 0) {
+          res.status(200).json({ message: '文章发布状态更新成功' })
+        } else {
+          res.status(404).json({ message: '文章不存在或已被更新' })
+        }
+      }
+    })
+  },
+  //删除文章
+  deleteArticle: (req, res, next) => {
+    const data = req.body
+    const user = req.user.id
+    let _sql = 'DELETE FROM article WHERE id = $1 and user_id = $2;'
+    pool.query(_sql, [data.id, user], (err, result) => {
+      if (err) {
+        console.error(err)
+        res.status(500).json({ error: '数据库删除错误' })
+      } else {
+        if (result.rowCount > 0) {
+          res.status(200).json({ message: '文章删除成功' })
+        } else {
+          res.status(404).json({ message: '文章不存在或已被删除' })
+        }
       }
     })
   },

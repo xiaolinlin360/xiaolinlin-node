@@ -13,6 +13,8 @@ import {
   readMessage,
   getArticle,
   getTotalArticle,
+  updateArticleStatus,
+  deleteArticle,
 } from './routes/index.js'
 import { create } from './model/db.js'
 create()
@@ -46,6 +48,8 @@ getTotalMessage(app)
 readMessage(app)
 getArticle(app)
 getTotalArticle(app)
+updateArticleStatus(app)
+deleteArticle(app)
 app.listen(port, () => {
   console.log(`服务器启动成功，监听端口：${port}`)
 })
