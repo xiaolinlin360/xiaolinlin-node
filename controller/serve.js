@@ -134,5 +134,30 @@ const serve = {
       }
     })
   },
+  //获取文章
+  getArticle: (req, res, next) => {
+    let _sql = 'SELECT * FROM article ORDER BY id LIMIT $1 OFFSET $2;'
+    pool.query(_sql, [pageSize, (pageNum - 1) * pageSize], (err, result) => {
+      if (err) {
+        console.error(err)
+        res.status(500).json({ error: '数据库查询错误' })
+      } else {
+        res.status(200).json({ data: result.rows, pageSize, pageNum })
+      }
+    })
+  },
+  //获取文章总数
+  getTotalArticle: (req, res, next) => {
+    let _sql = 'SELECT COUNT(*) AS total FROM article;'
+    pool.query(_sql, (err, result) => {
+      if (err) {
+        console.error(err)
+        res.status(500).json({ error: '数据库查询错误' })
+      } else {
+        const total = Number(result.rows[0].total)
+        res.status(200).json({ total: total })
+      }
+    })
+  },
 }
 export default serve

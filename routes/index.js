@@ -61,3 +61,17 @@ export const readMessage = (app) => {
     serve.readMessage(req, res)
   })
 }
+
+//获取文章
+export const getArticle = (app) => {
+  app.post('/getArticle', auth, (req, res) => {
+    serve.getArticle(req, res)
+  })
+}
+
+//获取文章总数
+export const getTotalArticle = (app) => {
+  app.post('/getTotalArticle', auth, (req, res) => {
+    serve.getTotalArticle(req, res)
+  })
+}
