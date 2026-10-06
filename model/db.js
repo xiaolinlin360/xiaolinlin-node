@@ -91,6 +91,7 @@ const dbTables = {
         CREATE TABLE IF NOT EXISTS label (
             id SERIAL PRIMARY KEY,
             label_name VARCHAR(100) NOT NULL,
+            user_id VARCHAR(100) NOT NULL,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );

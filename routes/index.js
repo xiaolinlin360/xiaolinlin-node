@@ -117,3 +117,31 @@ export const deleteSubset = (app) => {
     serve.deleteSubset(req, res)
   })
 }
+
+//获取标签
+export const getLabel = (app) => {
+  app.post('/getLabel', auth, (req, res) => {
+    serve.getLabel(req, res)
+  })
+}
+
+//新建标签
+export const insertLabel = (app) => {
+  app.post('/insertLabel', auth, (req, res) => {
+    serve.insertLabel(req, res)
+  })
+}
+
+//修改标签
+export const updateLabel = (app) => {
+  app.post('/updateLabel', auth, (req, res) => {
+    serve.updateLabel(req, res)
+  })
+}
+
+//删除标签
+export const deleteLabel = (app) => {
+  app.post('/deleteLabel', auth, (req, res) => {
+    serve.deleteLabel(req, res)
+  })
+}
