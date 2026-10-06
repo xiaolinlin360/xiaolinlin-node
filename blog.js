@@ -26,6 +26,8 @@ import {
   getFile,
   getTotalFile,
   moveFile,
+  getDiary,
+  getTotalDiary,
 } from './routes/index.js'
 import { create } from './model/db.js'
 create()
@@ -72,6 +74,8 @@ deleteLabel(app)
 getFile(app)
 getTotalFile(app)
 moveFile(app)
+getDiary(app)
+getTotalDiary(app)
 app.listen(port, () => {
   console.log(`服务器启动成功，监听端口：${port}`)
 })

@@ -166,3 +166,16 @@ export const moveFile = (app) => {
     serve.moveFile(req, res)
   })
 }
+
+//获取日记diary（分页查询）
+export const getDiary = (app) => {
+  app.post('/getDiary', auth, (req, res) => {
+    serve.getDiary(req, res)
+  })
+}
+//获取日记总数
+export const getTotalDiary = (app) => {
+  app.post('/getTotalDiary', auth, (req, res) => {
+    serve.getTotalDiary(req, res)
+  })
+}

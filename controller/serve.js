@@ -402,5 +402,50 @@ const serve = {
       }
     })
   },
+  //获取日记diary（分页查询）（模糊查询那些后面在做）
+  getDiary: (req, res, next) => {
+    const pageSize = req.body.pageSize || 10
+    const pageNum = req.body.pageNum || 0
+    const user = req.user.id
+    let _sql = 'SELECT * FROM diary WHERE user_id = $1 ORDER BY id DESC LIMIT $2 OFFSET $3;'
+    pool.query(_sql, [user, pageSize, (pageNum - 1) * pageSize], (err, result) => {
+      if (err) {
+        console.error(err)
+        res.status(500).json({ error: '数据库查询错误' })
+      } else {
+        res.status(200).json({ data: result.rows })
+      }
+    })
+  },
+  //获取日记总数
+  getTotalDiary: (req, res, next) => {
+    let _sql = 'SELECT COUNT(*) FROM diary;'
+    pool.query(_sql, (err, result) => {
+      if (err) {
+        console.error(err)
+        res.status(500).json({ error: '数据库查询错误' })
+      } else {
+        res.status(200).json({ data: result.rows[0].count })
+      }
+    })
+  },
+  //新建日记
+  insertDiary: (req, res, next) => {
+    const data = req.body
+    const user = req.user.id
+    let _sql = 'INSERT INTO diary (user_id, title, content) VALUES ($1, $2, $3);'
+    pool.query(_sql, [user, data.title, data.content], (err, result) => {
+      if (err) {
+        console.error(err)
+        res.status(500).json({ error: '数据库插入错误' })
+      } else {
+        if (result.rowCount > 0) {
+          res.status(200).json({ message: '日记新建成功' })
+        } else {
+          res.status(404).json({ message: '日记不存在或已被新建' })
+        }
+      }
+    })
+  },
 }
 export default serve
