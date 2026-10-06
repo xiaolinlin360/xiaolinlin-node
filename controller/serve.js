@@ -216,5 +216,65 @@ const serve = {
       }
     })
   },
+  //新建分组
+  insertSubset: (req, res, next) => {
+    const data = req.body
+    const user = req.user.id
+    if (!data.classif) {
+      return res.status(400).json({ error: '分组名称不能为空' })
+    }
+    let _sql = 'INSERT INTO subset (classif, user_id) VALUES ($1, $2);'
+    pool.query(_sql, [data.classif, user], (err, result) => {
+      if (err) {
+        console.error(err)
+        res.status(500).json({ error: '数据库插入错误' })
+      } else {
+        if (result.rowCount > 0) {
+          res.status(200).json({ message: '分组新建成功' })
+        } else {
+          res.status(404).json({ message: '分组不存在或已被新建' })
+        }
+      }
+    })
+  },
+  //修改分组名字
+  updateSubset: (req, res, next) => {
+    const data = req.body
+    const user = req.user.id
+    if (!data.classif) {
+      return res.status(400).json({ error: '分组名称不能为空' })
+    }
+    let _sql = 'UPDATE subset SET classif = $1 WHERE id = $2 and user_id = $3;'
+    pool.query(_sql, [data.classif, data.id, user], (err, result) => {
+      if (err) {
+        console.error(err)
+        res.status(500).json({ error: '数据库更新错误' })
+      } else {
+        if (result.rowCount > 0) {
+          res.status(200).json({ message: '分组名字更新成功' })
+        } else {
+          res.status(404).json({ message: '分组不存在或已被更新' })
+        }
+      }
+    })
+  },
+  //删除分组
+  deleteSubset: (req, res, next) => {
+    const data = req.body
+    const user = req.user.id
+    let _sql = 'DELETE FROM subset WHERE id = $1 and user_id = $2;'
+    pool.query(_sql, [data.id, user], (err, result) => {
+      if (err) {
+        console.error(err)
+        res.status(500).json({ error: '数据库删除错误' })
+      } else {
+        if (result.rowCount > 0) {
+          res.status(200).json({ message: '分组删除成功' })
+        } else {
+          res.status(404).json({ message: '分组不存在或已被删除' })
+        }
+      }
+    })
+  },
 }
 export default serve

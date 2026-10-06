@@ -96,3 +96,24 @@ export const getSubset = (app) => {
     serve.getSubset(req, res)
   })
 }
+
+//新建分组
+export const insertSubset = (app) => {
+  app.post('/insertSubset', auth, (req, res) => {
+    serve.insertSubset(req, res)
+  })
+}
+
+//修改分组名字
+export const updateSubset = (app) => {
+  app.post('/updateSubset', auth, (req, res) => {
+    serve.updateSubset(req, res)
+  })
+}
+
+//删除分组
+export const deleteSubset = (app) => {
+  app.post('/deleteSubset', auth, (req, res) => {
+    serve.deleteSubset(req, res)
+  })
+}
