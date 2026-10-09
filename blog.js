@@ -39,7 +39,13 @@ app.use(
     origin: true, // 替换成你的前端地址，或者写 true 允许所有
     credentials: true, // 允许携带 Cookie
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
+    allowedHeaders: [
+      'Content-Type',
+      'Authorization',
+      'X-Requested-With',
+      'Accept',
+      'x-custom-header',
+    ],
   })
 )
 

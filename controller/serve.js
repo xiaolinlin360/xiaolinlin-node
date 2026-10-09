@@ -47,9 +47,9 @@ const serve = {
           const user = result.rows[0]
           // 生成token
           const token = generateToken(user.id, user.name)
-          res.status(200).json({ message: '登录成功', token: token })
+          res.status(200).json({ message: '登录成功', token: token, code: 200 })
         } else {
-          res.status(401).json({ message: '登录失败' })
+          res.status(401).json({ message: '登录失败', code: 401 })
         }
       }
     })
