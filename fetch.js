@@ -1,8 +1,8 @@
 //模拟前端发送请求
-// fetch('https://projectors-brook-implementation-zen.trycloudflare.com/')
-//   .then((res) => res.json())
-//   .then((json) => console.log(json))
-//   .catch((err) => console.error(err))
+fetch('https://skating-hydrocodone-meanwhile-brands.trycloudflare.com/')
+  .then((res) => res.json())
+  .then((json) => console.log(json))
+  .catch((err) => console.error(err))
 
 // post注册一个用户
 // fetch('http://localhost:3001/insertUser', {
@@ -24,19 +24,19 @@
 //   .catch((err) => console.error(err))
 
 //用张三的号去登录
-fetch('http://localhost:3001/login', {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json',
-  },
-  body: JSON.stringify({
-    name: '博客主',
-    password: '123456',
-  }),
-})
-  .then((res) => res.json())
-  .then((json) => console.log(json))
-  .catch((err) => console.error(err))
+// fetch('http://localhost:3001/login', {
+//   method: 'POST',
+//   headers: {
+//     'Content-Type': 'application/json',
+//   },
+//   body: JSON.stringify({
+//     name: '博客主',
+//     password: '123456',
+//   }),
+// })
+//   .then((res) => res.json())
+//   .then((json) => console.log(json))
+//   .catch((err) => console.error(err))
 
 // 用张三的号，去获取评论
 // const token =
