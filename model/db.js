@@ -62,7 +62,7 @@ const dbTables = {
         content TEXT,
         cover VARCHAR(255),
         views INT DEFAULT 0,
-        state INT DEFAULT 0,
+        state INT DEFAULT 0, --0=草稿，1=已发布，2=审核中，3=已删除
         author_id INT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -184,8 +184,8 @@ const dbTables = {
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         CONSTRAINT fk_record_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
     );
-  `
-};
+  `,
+}
 // 创建所有表
 // 注意：PostgreSQL 没有 "create database if not exists" 这种写法，
 // 所以数据库 xxblog 请你提前手动建好（用 pgAdmin 右键新建，或命令行 createdb xxblog）

@@ -1,5 +1,5 @@
 //模拟前端发送请求
-// fetch('http://localhost:3001/')
+// fetch('https://projectors-brook-implementation-zen.trycloudflare.com/')
 //   .then((res) => res.json())
 //   .then((json) => console.log(json))
 //   .catch((err) => console.error(err))
@@ -38,10 +38,10 @@ fetch('http://localhost:3001/login', {
   .then((json) => console.log(json))
   .catch((err) => console.error(err))
 
-//用张三的号，去获取评论
+// 用张三的号，去获取评论
 // const token =
-//   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmFtZSI6IuW8oOS4iSIsImlhdCI6MTc5MTIwMzg0OSwiZXhwIjoxNzkxODA4NjQ5fQ.jO7akibCTV4v-ADhZc9AUBdWVtHTqU8DkdGfOvxFeDY'
-// fetch('http://localhost:3001/getComment', {
+//   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmFtZSI6IuWNmuWuouS4uyIsImlhdCI6MTc5MTYwMDYwMywiZXhwIjoxNzkyMjA1NDAzfQ.wKcFRdryOfPYKiRxZSiamDqucqtjbyCcYBHX7uTWeT8'
+// fetch('https://projectors-brook-implementation-zen.trycloudflare.com/getComment', {
 //   method: 'POST',
 //   headers: {
 //     'Content-Type': 'application/json',
@@ -53,16 +53,16 @@ fetch('http://localhost:3001/login', {
 //   }),
 // })
 //   .then((res) => res.json())
-//   .then((json) => console.log(json))
+//   .then((json) => console.dir(json, { depth: null }))
 //   .catch((err) => console.error(err))
 
-const a = () => {
-  let b = 1
-  return () => {
-    b++
-  }
-}
-const c = a()
-setInterval(() => {
-  console.log(c())
-}, 1000)
+// const a = () => {
+//   let b = 1
+//   return () => {
+//     b++
+//   }
+// }
+// const c = a()
+// setInterval(() => {
+//   console.log(c())
+// }, 1000)
