@@ -58,6 +58,18 @@ const commentController = {
       }
     })
   },
+  //删除评论
+  deleteComment: (req, res, next) => {
+    let _sql = 'DELETE FROM comments WHERE id = $1;'
+    pool.query(_sql, [req.body.id], (err, result) => {
+      if (err) {
+        console.error(err)
+        res.status(500).json({ data: { message: null, error: '数据库查询错误' }, code: 500 })
+      } else {
+        res.status(200).json({ data: { message: '评论删除成功', error: null }, code: 200 })
+      }
+    })
+  },
 }
 
 export default commentController

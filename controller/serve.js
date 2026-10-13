@@ -14,6 +14,7 @@ const serve = {
   //评论
   getComment: commentController.getComment,
   getTotalComment: commentController.getTotalComment,
+  deleteComment: commentController.deleteComment,
   //消息
   getMessage: messageController.getMessage,
   getTotalMessage: messageController.getTotalMessage,

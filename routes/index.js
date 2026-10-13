@@ -41,6 +41,13 @@ export const getTotalComment = (app) => {
   })
 }
 
+//删除评论
+export const deleteComment = (app) => {
+  app.post('/deleteComment', auth, (req, res) => {
+    serve.deleteComment(req, res)
+  })
+}
+
 //获取私信message
 export const getMessage = (app) => {
   app.post('/getMessage', auth, (req, res) => {
