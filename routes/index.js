@@ -9,146 +9,146 @@ export const hi = (app) => {
 }
 //验证是否注册
 export const isRegistered = (app) => {
-  app.post('/isRegistered', (req, res) => {
+  app.post('/user/isRegistered', (req, res) => {
     serve.isRegistered(req, res)
   })
 }
 //注册用户
 export const insertUser = (app) => {
-  app.post('/insertUser', (req, res) => {
+  app.post('/user/insertUser', (req, res) => {
     serve.insertUser(req, res)
   })
 }
 
 //注册登录
 export const login = (app) => {
-  app.post('/login', (req, res) => {
+  app.post('/user/login', (req, res) => {
     serve.login(req, res)
   })
 }
 
 //获取评论
 export const getComment = (app) => {
-  app.post('/getComment', auth, (req, res) => {
+  app.post('/comment/getComment', auth, (req, res) => {
     serve.getComment(req, res)
   })
 }
 
 //获取评论总数，总页码让前端自己算
 export const getTotalComment = (app) => {
-  app.post('/getTotalComment', auth, (req, res) => {
+  app.post('/comment/getTotalComment', auth, (req, res) => {
     serve.getTotalComment(req, res)
   })
 }
 
 //删除评论
 export const deleteComment = (app) => {
-  app.post('/deleteComment', auth, (req, res) => {
+  app.post('/comment/deleteComment', auth, (req, res) => {
     serve.deleteComment(req, res)
   })
 }
 
 //获取私信message
 export const getMessage = (app) => {
-  app.post('/getMessage', auth, (req, res) => {
+  app.post('/message/getMessage', auth, (req, res) => {
     serve.getMessage(req, res)
   })
 }
 
 //获取私信总数
 export const getTotalMessage = (app) => {
-  app.post('/getTotalMessage', auth, (req, res) => {
+  app.post('/message/getTotalMessage', auth, (req, res) => {
     serve.getTotalMessage(req, res)
   })
 }
 
 //将某一条私信标记为已读
 export const readMessage = (app) => {
-  app.post('/readMessage', auth, (req, res) => {
+  app.post('/message/readMessage', auth, (req, res) => {
     serve.readMessage(req, res)
   })
 }
 
 //获取文章
 export const getArticle = (app) => {
-  app.post('/getArticle', auth, (req, res) => {
+  app.post('/article/getArticle', auth, (req, res) => {
     serve.getArticle(req, res)
   })
 }
 
 //获取文章总数
 export const getTotalArticle = (app) => {
-  app.post('/getTotalArticle', auth, (req, res) => {
+  app.post('/article/getTotalArticle', auth, (req, res) => {
     serve.getTotalArticle(req, res)
   })
 }
 
 //修改文章的发布状态
 export const updateArticleStatus = (app) => {
-  app.post('/updateArticleStatus', auth, (req, res) => {
+  app.post('/article/updateArticleStatus', auth, (req, res) => {
     serve.updateArticleStatus(req, res)
   })
 }
 
 //删除文章
 export const deleteArticle = (app) => {
-  app.post('/deleteArticle', auth, (req, res) => {
+  app.post('/article/deleteArticle', auth, (req, res) => {
     serve.deleteArticle(req, res)
   })
 }
 
 //获取分组
 export const getSubset = (app) => {
-  app.post('/getSubset', auth, (req, res) => {
+  app.post('/subset/getSubset', auth, (req, res) => {
     serve.getSubset(req, res)
   })
 }
 
 //新建分组
 export const insertSubset = (app) => {
-  app.post('/insertSubset', auth, (req, res) => {
+  app.post('/subset/insertSubset', auth, (req, res) => {
     serve.insertSubset(req, res)
   })
 }
 
 //修改分组名字
 export const updateSubset = (app) => {
-  app.post('/updateSubset', auth, (req, res) => {
+  app.post('/subset/updateSubset', auth, (req, res) => {
     serve.updateSubset(req, res)
   })
 }
 
 //删除分组
 export const deleteSubset = (app) => {
-  app.post('/deleteSubset', auth, (req, res) => {
+  app.post('/subset/deleteSubset', auth, (req, res) => {
     serve.deleteSubset(req, res)
   })
 }
 
 //获取标签
 export const getLabel = (app) => {
-  app.post('/getLabel', auth, (req, res) => {
+  app.post('/label/getLabel', auth, (req, res) => {
     serve.getLabel(req, res)
   })
 }
 
 //新建标签
 export const insertLabel = (app) => {
-  app.post('/insertLabel', auth, (req, res) => {
+  app.post('/label/insertLabel', auth, (req, res) => {
     serve.insertLabel(req, res)
   })
 }
 
 //修改标签
 export const updateLabel = (app) => {
-  app.post('/updateLabel', auth, (req, res) => {
+  app.post('/label/updateLabel', auth, (req, res) => {
     serve.updateLabel(req, res)
   })
 }
 
 //删除标签
 export const deleteLabel = (app) => {
-  app.post('/deleteLabel', auth, (req, res) => {
+  app.post('/label/deleteLabel', auth, (req, res) => {
     serve.deleteLabel(req, res)
   })
 }

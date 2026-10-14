@@ -1,5 +1,4 @@
 import pool from '../../model/db.js'
-import { generateToken, verifyToken } from '../../lib/jwt.js'
 
 const messageController = {
   //获取私信message
@@ -11,14 +10,28 @@ const messageController = {
     if (pageNum < 1) pageNum = 1
     if (pageSize < 1) pageSize = 10
     if (pageSize > 100) pageSize = 100
-    let _sql = 'SELECT * FROM message WHERE receiver_id = $1 ORDER BY id LIMIT $2 OFFSET $3;'
+
+    // 通过 sender_id 关联 users 表，拿到发送者的头像和名字
+    const _sql = `
+    SELECT
+      m.*,
+      u.imgurl AS sender_imgurl,
+      u.name   AS sender_name
+    FROM message m
+    LEFT JOIN users u ON u.id = m.sender_id
+    WHERE m.receiver_id = $1
+    ORDER BY m.id
+    LIMIT $2 OFFSET $3;
+  `
     pool.query(_sql, [user, pageSize, (pageNum - 1) * pageSize], (err, result) => {
       if (err) {
         console.error(err)
-        res.status(500).json({ data: { error: '数据库查询错误' }, code: 500 })
-      } else {
-        res.status(200).json({ data: { messages: result.rows, pageSize, pageNum }, code: 200 })
+        return res.status(500).json({ data: { error: '数据库查询错误' }, code: 500 })
       }
+      res.status(200).json({
+        data: { messages: result.rows, pageSize, pageNum },
+        code: 200,
+      })
     })
   },
   //获取私信总数
@@ -47,9 +60,11 @@ const messageController = {
         res.status(500).json({ data: { error: '数据库更新错误' }, code: 500 })
       } else {
         if (result.rowCount > 0) {
-          res.status(200).json({ data: { message: '私信标记为已读成功' }, code: 200 })
+          res.status(200).json({ data: { message: '私信标记为已读成功', is_read: 1 }, code: 200 })
         } else {
-          res.status(404).json({ data: { message: '私信不存在或已被标记' }, code: 404 })
+          res
+            .status(404)
+            .json({ data: { message: '私信不存在或已被标记', is_read: -1 }, code: 404 })
         }
       }
     })
