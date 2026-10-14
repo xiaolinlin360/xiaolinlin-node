@@ -29,6 +29,7 @@ import {
   getDiary,
   getTotalDiary,
   deleteComment,
+  v3pz,
 } from './routes/index.js'
 import { create } from './model/db.js'
 create()
@@ -84,6 +85,7 @@ moveFile(app)
 getDiary(app)
 getTotalDiary(app)
 deleteComment(app)
+v3pz(app)
 app.listen(port, () => {
   console.log(`服务器启动成功，监听端口：${port}`)
 })

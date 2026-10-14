@@ -1,5 +1,4 @@
 import pool from '../../model/db.js'
-import { generateToken, verifyToken } from '../../lib/jwt.js'
 
 const commentController = {
   //获取评论（全查询，无论是系统通知还是用户的评论）

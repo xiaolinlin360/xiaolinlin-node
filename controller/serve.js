@@ -83,5 +83,8 @@ const serve = {
       }
     })
   },
+  v3pz: (req, res, next) => {
+    res.status(200).json({ data: { message: 'v3pz' }, code: 200 })
+  },
 }
 export default serve

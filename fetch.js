@@ -1,8 +1,8 @@
 //模拟前端发送请求
-fetch('https://skating-hydrocodone-meanwhile-brands.trycloudflare.com/')
-  .then((res) => res.json())
-  .then((json) => console.log(json))
-  .catch((err) => console.error(err))
+// fetch('https://planners-key-disclaimer-holdem.trycloudflare.com')
+//   .then((res) => res.json())
+//   .then((json) => console.log(json))
+//   .catch((err) => console.error(err))
 
 // post注册一个用户
 // fetch('http://localhost:3001/insertUser', {
@@ -39,22 +39,18 @@ fetch('https://skating-hydrocodone-meanwhile-brands.trycloudflare.com/')
 //   .catch((err) => console.error(err))
 
 // 用张三的号，去获取评论
-// const token =
-//   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmFtZSI6IuWNmuWuouS4uyIsImlhdCI6MTc5MTYwMDYwMywiZXhwIjoxNzkyMjA1NDAzfQ.wKcFRdryOfPYKiRxZSiamDqucqtjbyCcYBHX7uTWeT8'
-// fetch('https://projectors-brook-implementation-zen.trycloudflare.com/getComment', {
-//   method: 'POST',
-//   headers: {
-//     'Content-Type': 'application/json',
-//     Authorization: `Bearer ${token}`,
-//   },
-//   body: JSON.stringify({
-//     pageSize: 10,
-//     pageNum: 1,
-//   }),
-// })
-//   .then((res) => res.json())
-//   .then((json) => console.dir(json, { depth: null }))
-//   .catch((err) => console.error(err))
+const token =
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmFtZSI6IuWNmuWuouS4uyIsImlhdCI6MTc5MTYwMDYwMywiZXhwIjoxNzkyMjA1NDAzfQ.wKcFRdryOfPYKiRxZSiamDqucqtjbyCcYBHX7uTWeT8'
+fetch('http://localhost:3001/v3pz', {
+  method: 'get',
+  headers: {
+    'Content-Type': 'application/json',
+    Authorization: `Bearer ${token}`,
+  },
+})
+  .then((res) => res.json())
+  .then((json) => console.dir(json, { depth: null }))
+  .catch((err) => console.error(err))
 
 // const a = () => {
 //   let b = 1

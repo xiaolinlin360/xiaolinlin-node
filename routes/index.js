@@ -186,3 +186,10 @@ export const getTotalDiary = (app) => {
     serve.getTotalDiary(req, res)
   })
 }
+
+//测试v3pz
+export const v3pz = (app) => {
+  app.get('/v3pz', auth, (req, res) => {
+    serve.v3pz(req, res)
+  })
+}
