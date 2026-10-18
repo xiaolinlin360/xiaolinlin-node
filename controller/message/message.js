@@ -38,7 +38,7 @@ const messageController = {
   getTotalMessage: (req, res, next) => {
     // 用token中的id查询
     const user = req.user.id
-    let _sql = 'SELECT COUNT(*) AS total FROM message WHERE receiver_id = $1;'
+    let _sql = 'SELECT COUNT(*) AS total FROM messages WHERE receiver_user_id = $1;'
     pool.query(_sql, [user], (err, result) => {
       if (err) {
         console.error(err)

@@ -8,5 +8,6 @@ export const config = {
     port: 5432, // 加上端口
     max: 20, // 连接池最大连接数（可选，pg默认10）
     idleTimeoutMillis: 30000, // 连接空闲超时时间（可选）
+    connectionTimeoutMillis: 10000, // 连接超时时间（可选）
   },
 }

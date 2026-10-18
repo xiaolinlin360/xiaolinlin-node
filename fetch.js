@@ -1,5 +1,14 @@
 //模拟前端发送请求
-// fetch('https://planners-key-disclaimer-holdem.trycloudflare.com')
+// fetch('http://localhost:3001/user/login', {
+//   method: 'post',
+//   headers: {
+//     'Content-Type': 'application/json',
+//   },
+//   body: JSON.stringify({
+//     name: '博主A',
+//     password: 'password123',
+//   }),
+// })
 //   .then((res) => res.json())
 //   .then((json) => console.log(json))
 //   .catch((err) => console.error(err))
@@ -26,7 +35,7 @@
 // 用张三的号去登录
 
 const token =
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmFtZSI6IuWNmuWuouS4uyIsImlhdCI6MTc5MTYwMDYwMywiZXhwIjoxNzkyMjA1NDAzfQ.wKcFRdryOfPYKiRxZSiamDqucqtjbyCcYBHX7uTWeT8'
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjExMTExMTExLTExMTEtMTExMS0xMTExLTExMTExMTExMTExMSIsIm5hbWUiOiLljZrkuLtBIiwiaWF0IjoxNzkyMzM5MzAwLCJleHAiOjE3OTI5NDQxMDB9.NAyANMB50A9S4osinCDhBcpPvpVnoNeap1tzQWH3IB0'
 fetch('http://localhost:3001/message/getTotalMessage', {
   method: 'POST',
   headers: {
@@ -66,3 +75,21 @@ fetch('http://localhost:3001/message/getTotalMessage', {
 // setInterval(() => {
 //   console.log(c())
 // }, 1000)
+
+// const category = {
+//   文章: {
+//     已经发布的文章: {
+//       id: 1,
+//       title: '文章1',
+//       content: '这是文章1的内容',
+//       created_at: '2023-01-01 10:00:00',
+//       updated_at: '2023-01-01 10:00:00',
+//       user_id: 1,
+//       subset_id: 1,
+//       file_id: 1,
+//     },
+//     未发布的文章: {},
+//     xiaolinlin的文章: {},
+//   },
+//   摄影: {},
+// }

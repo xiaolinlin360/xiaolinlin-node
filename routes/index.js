@@ -29,21 +29,21 @@ export const login = (app) => {
 
 //获取评论
 export const getComment = (app) => {
-  app.post('/comment/getComment', auth, (req, res) => {
+  app.post('/comments/getComment', auth, (req, res) => {
     serve.getComment(req, res)
   })
 }
 
 //获取评论总数，总页码让前端自己算
 export const getTotalComment = (app) => {
-  app.post('/comment/getTotalComment', auth, (req, res) => {
+  app.post('/comments/getTotalComment', auth, (req, res) => {
     serve.getTotalComment(req, res)
   })
 }
 
 //删除评论
 export const deleteComment = (app) => {
-  app.post('/comment/deleteComment', auth, (req, res) => {
+  app.post('/comments/deleteComment', auth, (req, res) => {
     serve.deleteComment(req, res)
   })
 }
