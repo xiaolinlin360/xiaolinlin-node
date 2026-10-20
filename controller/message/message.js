@@ -66,8 +66,8 @@ const messageController = {
             .json({ data: { message: '私信标记为已读成功', is_read: true }, code: 200 })
         } else {
           res
-            .status(404)
-            .json({ data: { message: '私信不存在或已被标记', is_read: false }, code: 404 })
+            .status(200)
+            .json({ data: { message: '私信不存在或已被标记', is_read: false }, code: 200 })
         }
       }
     })

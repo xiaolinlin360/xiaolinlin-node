@@ -4,11 +4,10 @@ import { generateToken, verifyToken } from '../../lib/jwt.js'
 const subsetController = {
   //获取分组(单个人的博客，只有单个人的分组所以直接拿到表)
   getSubset: (req, res, next) => {
-    let data = []
-    if (req.body?.classif) data.push(req.body?.classif)
-    let _sql = 'SELECT * FROM subset WHERE classif = $1;'
-    if (data.length === 0) _sql = 'SELECT * FROM subset;'
-    pool.query(_sql, data, (err, result) => {
+    const user = req.user.id //从token中获取用户id,后期用来校验博客主账号
+    let data = req.body.category_id
+    let _sql = 'SELECT * FROM subsets WHERE category_id = $1;'
+    pool.query(_sql, [data], (err, result) => {
       if (err) {
         console.error(err)
         res.status(500).json({ data: { error: '数据库查询错误' }, code: 500 })
@@ -21,11 +20,11 @@ const subsetController = {
   insertSubset: (req, res, next) => {
     const data = req.body
     const user = req.user.id
-    if (!data.classif) {
-      return res.status(400).json({ data: { error: '分组名称不能为空' }, code: 400 })
+    if (!data.category_id || !data.name) {
+      return res.status(400).json({ data: { error: '分组分类或名称不能为空' }, code: 400 })
     }
-    let _sql = 'INSERT INTO subset (classif, user_id) VALUES ($1, $2);'
-    pool.query(_sql, [data.classif, user], (err, result) => {
+    let _sql = 'INSERT INTO subsets (category_id, name, user_id) VALUES ($1, $2, $3);'
+    pool.query(_sql, [data.category_id, data.name, user], (err, result) => {
       if (err) {
         console.error(err)
         res.status(500).json({ data: { error: '数据库插入错误' }, code: 500 })
@@ -45,8 +44,8 @@ const subsetController = {
     if (!data.classif) {
       return res.status(400).json({ data: { error: '分组名称不能为空' }, code: 400 })
     }
-    let _sql = 'UPDATE subset SET classif = $1 WHERE id = $2 and user_id = $3;'
-    pool.query(_sql, [data.classif, data.id, user], (err, result) => {
+    let _sql = 'UPDATE subsets SET name = $1 WHERE id = $2 and user_id = $3;'
+    pool.query(_sql, [data.name, data.id, user], (err, result) => {
       if (err) {
         console.error(err)
         res.status(500).json({ data: { error: '数据库更新错误' }, code: 500 })
@@ -63,7 +62,7 @@ const subsetController = {
   deleteSubset: (req, res, next) => {
     const data = req.body
     const user = req.user.id
-    let _sql = 'DELETE FROM subset WHERE id = $1 and user_id = $2;'
+    let _sql = 'DELETE FROM subsets WHERE id = $1 and user_id = $2;'
     pool.query(_sql, [data.id, user], (err, result) => {
       if (err) {
         console.error(err)

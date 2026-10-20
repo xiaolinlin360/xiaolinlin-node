@@ -1,36 +1,7 @@
 import { config } from './config/default.js'
 import express from 'express'
 import cors from 'cors'
-import {
-  hi,
-  isRegistered,
-  insertUser,
-  login,
-  getComment,
-  getTotalComment,
-  getMessage,
-  getTotalMessage,
-  readMessage,
-  getArticle,
-  getTotalArticle,
-  updateArticleStatus,
-  deleteArticle,
-  getSubset,
-  insertSubset,
-  updateSubset,
-  deleteSubset,
-  getLabel,
-  insertLabel,
-  updateLabel,
-  deleteLabel,
-  getFile,
-  getTotalFile,
-  moveFile,
-  getDiary,
-  getTotalDiary,
-  deleteComment,
-  v3pz,
-} from './routes/index.js'
+import * as routes from './routes/index.js'
 import { create } from './model/db.js'
 create()
 const app = express()
@@ -58,34 +29,11 @@ app.use(express.static(import.meta.dirname + '/data'))
 app.use(express.json())
 
 // 路由
-hi(app) // 调用路由函数，传入 app 实例
-isRegistered(app)
-insertUser(app)
-login(app)
-getComment(app)
-getTotalComment(app)
-getMessage(app)
-getTotalMessage(app)
-readMessage(app)
-getArticle(app)
-getTotalArticle(app)
-updateArticleStatus(app)
-deleteArticle(app)
-getSubset(app)
-insertSubset(app)
-updateSubset(app)
-deleteSubset(app)
-getLabel(app)
-insertLabel(app)
-updateLabel(app)
-deleteLabel(app)
-getFile(app)
-getTotalFile(app)
-moveFile(app)
-getDiary(app)
-getTotalDiary(app)
-deleteComment(app)
-v3pz(app)
+Object.values(routes).forEach((register) => {
+  if (typeof register === 'function') {
+    register(app)
+  }
+})
 app.listen(port, () => {
   console.log(`服务器启动成功，监听端口：${port}`)
 })

@@ -36,15 +36,14 @@
 
 const token =
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjExMTExMTExLTExMTEtMTExMS0xMTExLTExMTExMTExMTExMSIsIm5hbWUiOiLljZrkuLtBIiwiaWF0IjoxNzkyMzM5MzAwLCJleHAiOjE3OTI5NDQxMDB9.NAyANMB50A9S4osinCDhBcpPvpVnoNeap1tzQWH3IB0'
-fetch('http://localhost:3001/messages/getMessage', {
+fetch('http://localhost:3001/subsets/getSubset', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
     Authorization: `Bearer ${token}`,
   },
   body: JSON.stringify({
-    pageSize: 10,
-    pageNum: 1,
+    category_id: 'c2222222-2222-2222-2222-222222222222',
   }),
 })
   .then((res) => res.json())

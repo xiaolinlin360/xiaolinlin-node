@@ -6,6 +6,8 @@ import articleController from '../controller/article/article.js'
 import subsetController from '../controller/subset/subset.js'
 import labelController from '../controller/label/label.js'
 import fileController from '../controller/file/file.js'
+import categoryController from '../controller/subset/category.js'
+
 const serve = {
   //登录注册
   isRegistered: loginController.isRegistered,
@@ -25,6 +27,7 @@ const serve = {
   updateArticleStatus: articleController.updateArticleStatus,
   deleteArticle: articleController.deleteArticle,
   //子集
+  getCategory: categoryController.getCategory, //获取分组分类
   getSubset: subsetController.getSubset,
   insertSubset: subsetController.insertSubset,
   updateSubset: subsetController.updateSubset,
