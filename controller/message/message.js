@@ -17,9 +17,9 @@ const messageController = {
       m.*,
       u.imgurl AS sender_imgurl,
       u.name   AS sender_name
-    FROM message m
-    LEFT JOIN users u ON u.id = m.sender_id
-    WHERE m.receiver_id = $1
+    FROM messages m
+    LEFT JOIN users u ON u.id = m.send_user_id
+    WHERE m.receiver_user_id = $1
     ORDER BY m.id
     LIMIT $2 OFFSET $3;
   `
@@ -53,18 +53,21 @@ const messageController = {
   readMessage: (req, res, next) => {
     const data = req.body
     const user = req.user.id
-    let _sql = 'UPDATE message SET is_read = 1 WHERE id = $1 and receiver_id = $2;'
-    pool.query(_sql, [data.id, user], (err, result) => {
+    let _sql =
+      'UPDATE messages SET is_read = $1 WHERE receiver_user_id = $2 and id = $3 and is_read = $4;'
+    pool.query(_sql, [true, user, data.id, false], (err, result) => {
       if (err) {
         console.error(err)
         res.status(500).json({ data: { error: '数据库更新错误' }, code: 500 })
       } else {
         if (result.rowCount > 0) {
-          res.status(200).json({ data: { message: '私信标记为已读成功', is_read: 1 }, code: 200 })
+          res
+            .status(200)
+            .json({ data: { message: '私信标记为已读成功', is_read: true }, code: 200 })
         } else {
           res
             .status(404)
-            .json({ data: { message: '私信不存在或已被标记', is_read: -1 }, code: 404 })
+            .json({ data: { message: '私信不存在或已被标记', is_read: false }, code: 404 })
         }
       }
     })

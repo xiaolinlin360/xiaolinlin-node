@@ -17,9 +17,8 @@ const commentController = {
             c.article_id, 
             c.user_id, 
             c.content, 
-            c.is_complained, 
-            c.created_at, 
-            c.updated_at,
+            c.parent_id, 
+            c.created_at,
             u.name, 
             u.imgurl 
         FROM comments c

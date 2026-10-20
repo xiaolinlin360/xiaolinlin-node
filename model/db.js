@@ -11,6 +11,7 @@ const dbTables = {
         name TEXT NOT NULL,
         email TEXT UNIQUE,
         password TEXT NOT NULL,
+        imgurl TEXT, -- 头像路径
         is_deleted bool NOT NULL DEFAULT FALSE, -- 是否删除(默认未删除false)
         created_at TIMESTAMP DEFAULT NOW()
     );

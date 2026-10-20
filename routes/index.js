@@ -50,21 +50,21 @@ export const deleteComment = (app) => {
 
 //获取私信message
 export const getMessage = (app) => {
-  app.post('/message/getMessage', auth, (req, res) => {
+  app.post('/messages/getMessage', auth, (req, res) => {
     serve.getMessage(req, res)
   })
 }
 
 //获取私信总数
 export const getTotalMessage = (app) => {
-  app.post('/message/getTotalMessage', auth, (req, res) => {
+  app.post('/messages/getTotalMessage', auth, (req, res) => {
     serve.getTotalMessage(req, res)
   })
 }
 
 //将某一条私信标记为已读
 export const readMessage = (app) => {
-  app.post('/message/readMessage', auth, (req, res) => {
+  app.post('/messages/read', auth, (req, res) => {
     serve.readMessage(req, res)
   })
 }

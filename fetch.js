@@ -1,4 +1,4 @@
-//模拟前端发送请求
+// 模拟前端发送请求
 // fetch('http://localhost:3001/user/login', {
 //   method: 'post',
 //   headers: {
@@ -36,16 +36,16 @@
 
 const token =
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjExMTExMTExLTExMTEtMTExMS0xMTExLTExMTExMTExMTExMSIsIm5hbWUiOiLljZrkuLtBIiwiaWF0IjoxNzkyMzM5MzAwLCJleHAiOjE3OTI5NDQxMDB9.NAyANMB50A9S4osinCDhBcpPvpVnoNeap1tzQWH3IB0'
-fetch('http://localhost:3001/message/getTotalMessage', {
+fetch('http://localhost:3001/messages/getMessage', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
     Authorization: `Bearer ${token}`,
   },
-  // body: JSON.stringify({
-  //   pageSize: 10,
-  //   pageNum: 1,
-  // }),
+  body: JSON.stringify({
+    pageSize: 10,
+    pageNum: 1,
+  }),
 })
   .then((res) => res.json())
   .then((json) => console.dir(json, { depth: null }))
