@@ -25,9 +25,11 @@ const subsetController = {
     }
     let _sql = 'INSERT INTO subsets (category_id, name) VALUES ($1, $2);'
     pool.query(_sql, [data.category_id, data.name], (err, result) => {
-      if (err) {
-        console.error(err)
-        res.status(500).json({ data: { error: '数据库插入错误' }, code: 500 })
+      if (err && err.code === '23505') {
+        console.log(err.code)
+        res.status(400).json({ data: { message: '分组名称已存在' }, code: 400 })
+      } else if (err) {
+        res.status(500).json({ data: { message: '数据库插入错误' }, code: 500 })
       } else {
         if (result.rowCount > 0) {
           res.status(200).json({ data: { message: '分组新建成功' }, code: 200 })
@@ -64,7 +66,9 @@ const subsetController = {
     const user = req.user.id
     let _sql = 'DELETE FROM subsets WHERE id = $1;'
     pool.query(_sql, [data.id], (err, result) => {
-      if (err) {
+      if (err && err.code === '23503') {
+        res.status(400).json({ data: { message: '分组下未删除的信息，不能删除' }, code: 400 })
+      } else if (err) {
         console.error(err)
         res.status(500).json({ data: { error: '数据库删除错误' }, code: 500 })
       } else {
