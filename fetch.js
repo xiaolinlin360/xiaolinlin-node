@@ -35,15 +35,17 @@
 // 用张三的号去登录
 
 const token =
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjExMTExMTExLTExMTEtMTExMS0xMTExLTExMTExMTExMTExMSIsIm5hbWUiOiLljZrkuLtBIiwiaWF0IjoxNzkyMzM5MzAwLCJleHAiOjE3OTI5NDQxMDB9.NAyANMB50A9S4osinCDhBcpPvpVnoNeap1tzQWH3IB0'
-fetch('http://localhost:3001/subsets/deleteSubset', {
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjExMTExMTExLTExMTEtMTExMS0xMTExLTExMTExMTExMTExMSIsIm5hbWUiOiLljZrkuLtBIiwiaWF0IjoxNzkzMDE0Njk4LCJleHAiOjE3OTM2MTk0OTh9.DKpuCpRC43C4PYouhMFxTy4qHH_sJnl11Qtba11vU50'
+fetch('http://localhost:3001/article/getArticle', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
     Authorization: `Bearer ${token}`,
   },
   body: JSON.stringify({
-    id: 'e2222222-2222-2222-2222-222222222223',
+    pageSize: 10,
+    pageNum: 1,
+    subset_id: undefined,
   }),
 })
   .then((res) => res.json())

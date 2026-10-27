@@ -47,7 +47,6 @@ const dbTables = {
         CONSTRAINT fk_files_user_id_to_users_id FOREIGN KEY (user_id) REFERENCES users (id)
     );
   `,
-
   articles: `
     CREATE TABLE IF NOT EXISTS articles (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid (),
@@ -81,7 +80,7 @@ const dbTables = {
         article_id UUID NOT NULL,
         label_id UUID NOT NULL,
         created_at TIMESTAMP DEFAULT NOW(),
-        CONSTRAINT fk_article_label_article_id_to_articles_id FOREIGN KEY (article_id) REFERENCES articles (id),
+        CONSTRAINT fk_article_label_article_id_to_articles_id FOREIGN KEY (article_id) REFERENCES articles (id) ON DELETE CASCADE,
         CONSTRAINT fk_article_label_label_id_to_labels_id FOREIGN KEY (label_id) REFERENCES labels (id)
     );
   `,
@@ -93,7 +92,7 @@ const dbTables = {
         article_id UUID NOT NULL,
         created_at TIMESTAMP DEFAULT NOW(),
         CONSTRAINT fk_praise_user_id_to_users_id FOREIGN KEY (user_id) REFERENCES users (id),
-        CONSTRAINT fk_praise_article_id_to_articles_id FOREIGN KEY (article_id) REFERENCES articles (id)
+        CONSTRAINT fk_praise_article_id_to_articles_id FOREIGN KEY (article_id) REFERENCES articles (id) ON DELETE CASCADE 
     );
   `,
 
@@ -107,7 +106,7 @@ const dbTables = {
         content TEXT NOT NULL,
         created_at TIMESTAMP DEFAULT NOW(),
         CONSTRAINT fk_comments_user_id_to_users_id FOREIGN KEY (user_id) REFERENCES users (id),
-        CONSTRAINT fk_comments_article_id_to_articles_id FOREIGN KEY (article_id) REFERENCES articles (id),
+        CONSTRAINT fk_comments_article_id_to_articles_id FOREIGN KEY (article_id) REFERENCES articles (id) ON DELETE CASCADE, 
         CONSTRAINT fk_comments_reply_to_user_id_to_users_id FOREIGN KEY (reply_to_user_id) REFERENCES users (id),
         CONSTRAINT fk_comments_parent_id_to_comments_id FOREIGN KEY (parent_id) REFERENCES comments (id) on delete cascade
     );
