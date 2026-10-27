@@ -1,15 +1,10 @@
 import pool from '../../model/db.js'
 import { generateToken, verifyToken } from '../../lib/jwt.js'
 const labelController = {
-  //获取标签
+  //获取所有标签
   getLabel: (req, res, next) => {
-    let data = req.body?.label_name
-    if (!data) {
-      return res.status(400).json({ data: { error: '标签名称不能为空' }, code: 400 })
-    }
-    const user = req.user.id
-    let _sql = 'SELECT * FROM label WHERE label_name = $1 and user_id = $2;'
-    pool.query(_sql, [data, user], (err, result) => {
+    let _sql = 'SELECT * FROM labels;'
+    pool.query(_sql, (err, result) => {
       if (err) {
         console.error(err)
         res.status(500).json({ data: { error: '数据库查询错误' }, code: 500 })

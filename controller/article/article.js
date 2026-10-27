@@ -7,20 +7,32 @@ const articleController = {
     const data = req.body || {}
     const pageSize = Number(data.pageSize) || 10
     const pageNum = Number(data.pageNum) || 1
-    let sql =
-      'SELECT articles.*, users.name AS username_name FROM articles LEFT JOIN users ON articles.user_id = users.id '
+    // 💡 核心修改：使用 LATERAL 关联标签表，并把标签聚合成 JSON 数组
+    let sql = `
+    SELECT 
+      articles.*, 
+      users.name AS username_name,
+      COALESCE(t.labels, '[]') AS labels
+    FROM articles 
+    LEFT JOIN users ON articles.user_id = users.id 
+    LEFT JOIN LATERAL (
+      SELECT JSON_AGG(JSON_BUILD_OBJECT('id', l.id, 'label_name', l.label_name)) AS labels
+      FROM article_label al
+      JOIN labels l ON al.label_id = l.id
+      WHERE al.article_id = articles.id
+    ) t ON true
+  `
     const params = []
     let paramIndex = 1
-    // 合并条件判断（拦截 undefined, null, 空字符串）
+    // 原有条件判断
     if (data.subset_id !== undefined && data.subset_id !== null && data.subset_id !== '') {
       sql += `WHERE articles.subset_id = $${paramIndex} `
       params.push(data.subset_id)
       paramIndex++
     }
-    // 动态追加分页
-    sql += `ORDER BY articles.id LIMIT $${paramIndex} OFFSET $${paramIndex + 1};`
+    // 动态追加分页（原有逻辑完全不需要动）
+    sql += ` ORDER BY articles.id LIMIT $${paramIndex} OFFSET $${paramIndex + 1};`
     params.push(pageSize, (pageNum - 1) * pageSize)
-
     pool.query(sql, params, (err, result) => {
       if (err) {
         console.error(err)

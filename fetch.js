@@ -43,14 +43,13 @@ fetch('http://localhost:3001/article/getArticle', {
     Authorization: `Bearer ${token}`,
   },
   body: JSON.stringify({
-    pageSize: 10,
     pageNum: 1,
+    pageSize: 10,
     subset_id: undefined,
   }),
 })
   .then((res) => res.json())
   .then((json) => console.dir(json, { depth: null }))
-  .catch((err) => console.error(err))
 
 // 用张三的号，去获取评论
 // const token =
