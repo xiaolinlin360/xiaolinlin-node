@@ -21,7 +21,7 @@ const labelController = {
     if (!data.label_name) {
       return res.status(400).json({ data: { error: '标签名称不能为空' }, code: 400 })
     }
-    let _sql = 'INSERT INTO label (label_name) VALUES ($1);'
+    let _sql = 'INSERT INTO labels (label_name) VALUES ($1);'
     pool.query(_sql, [data.label_name], (err, result) => {
       if (err) {
         console.error(err)
@@ -42,7 +42,7 @@ const labelController = {
     if (!data.label_name) {
       return res.status(400).json({ error: '标签名称不能为空' })
     }
-    let _sql = 'UPDATE label SET label_name = $1 WHERE id = $2;'
+    let _sql = 'UPDATE labels SET label_name = $1 WHERE id = $2;'
     pool.query(_sql, [data.label_name, data.id], (err, result) => {
       if (err) {
         console.error(err)
@@ -60,7 +60,7 @@ const labelController = {
   deleteLabels: (req, res, next) => {
     const data = req.body
     const user = req.user.id //当前登录用户（以后再判断是否是当前登录用户）
-    let _sql = 'DELETE FROM label WHERE id = $1 ;'
+    let _sql = 'DELETE FROM labels WHERE id = $1 ;'
     pool.query(_sql, [data.id], (err, result) => {
       if (err) {
         console.error(err)

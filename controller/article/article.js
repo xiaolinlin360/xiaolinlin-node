@@ -42,16 +42,14 @@ const articleController = {
     })
   },
   //获取文章总数
-  getTotalArticle: (req, res, next) => {
-    let _sql = 'SELECT COUNT(*) AS total FROM articles;'
-    pool.query(_sql, (err, result) => {
-      if (err) {
-        console.error(err)
-        res.status(500).json({ data: { message: '数据库查询错误' }, code: 500 })
-      } else {
-        const total = Number(result.rows[0].total)
-        res.status(200).json({ data: { total: total }, code: 200 })
-      }
+  getTotalArticle: (req, res) => {
+    const subset_id = req.body?.subset_id
+    const _sql = subset_id
+      ? 'SELECT COUNT(*)::int AS total FROM articles WHERE subset_id = $1;'
+      : 'SELECT COUNT(*)::int AS total FROM articles;'
+    pool.query(_sql, subset_id ? [subset_id] : [], (err, result) => {
+      if (err) return res.status(500).json({ data: { message: '数据库查询错误' }, code: 500 })
+      res.status(200).json({ data: { total: result.rows[0].total }, code: 200 })
     })
   },
   //修改文章的发布状态

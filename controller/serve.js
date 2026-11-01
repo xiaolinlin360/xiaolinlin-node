@@ -40,7 +40,7 @@ const serve = {
   //文件
   getFile: fileController.getFile,
   getTotalFile: fileController.getTotalFile,
-  moveFile: fileController.moveFile,
+  // moveFile: fileController.moveFile,
   //获取日记diary（分页查询）（模糊查询那些后面在做）
   getDiary: (req, res, next) => {
     const pageSize = req.body.pageSize || 10
@@ -50,7 +50,7 @@ const serve = {
     pool.query(_sql, [user, pageSize, (pageNum - 1) * pageSize], (err, result) => {
       if (err) {
         console.error(err)
-        res.status(500).json({ data: { error: '数据库查询错误' }, code: 500 })
+        res.status(500).json({ data: { message: '数据库查询错误' }, code: 500 })
       } else {
         res.status(200).json({ data: result.rows, code: 200 })
       }
@@ -62,7 +62,7 @@ const serve = {
     pool.query(_sql, (err, result) => {
       if (err) {
         console.error(err)
-        res.status(500).json({ data: { error: '数据库查询错误' }, code: 500 })
+        res.status(500).json({ data: { message: '数据库查询错误' }, code: 500 })
       } else {
         res.status(200).json({ data: result.rows[0].count, code: 200 })
       }
@@ -76,7 +76,7 @@ const serve = {
     pool.query(_sql, [user, data.title, data.content], (err, result) => {
       if (err) {
         console.error(err)
-        res.status(500).json({ data: { error: '数据库插入错误' }, code: 500 })
+        res.status(500).json({ data: { message: '数据库插入错误' }, code: 500 })
       } else {
         if (result.rowCount > 0) {
           res.status(200).json({ data: { message: '日记新建成功' }, code: 200 })

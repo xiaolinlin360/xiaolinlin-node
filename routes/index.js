@@ -133,28 +133,28 @@ export const deleteSubset = (app) => {
 
 //获取标签
 export const getLabels = (app) => {
-  app.post('/label/getLabels', auth, (req, res) => {
+  app.post('/labels/getLabels', auth, (req, res) => {
     serve.getLabels(req, res)
   })
 }
 
 //新建标签
 export const insertLabels = (app) => {
-  app.post('/label/insertLabels', auth, (req, res) => {
+  app.post('/labels/insertLabels', auth, (req, res) => {
     serve.insertLabels(req, res)
   })
 }
 
 //修改标签
 export const updateLabels = (app) => {
-  app.post('/label/updateLabels', auth, (req, res) => {
+  app.post('/labels/updateLabels', auth, (req, res) => {
     serve.updateLabels(req, res)
   })
 }
 
 //删除标签
 export const deleteLabels = (app) => {
-  app.post('/label/deleteLabels', auth, (req, res) => {
+  app.post('/labels/deleteLabels', auth, (req, res) => {
     serve.deleteLabels(req, res)
   })
 }
@@ -174,11 +174,11 @@ export const getTotalFile = (app) => {
 }
 
 //移动文件到不同的分类（修改subset id）
-export const moveFile = (app) => {
-  app.post('/moveFile', auth, (req, res) => {
-    serve.moveFile(req, res)
-  })
-}
+// export const moveFile = (app) => {
+//   app.post('/moveFile', auth, (req, res) => {
+//     serve.moveFile(req, res)
+//   })
+// }
 
 //获取日记diary（分页查询）
 export const getDiary = (app) => {

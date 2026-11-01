@@ -20,8 +20,8 @@ const loginController = {
   //注册用户
   insertUser: (req, res, next) => {
     const data = req.body
-    let _sql = 'INSERT INTO users (id, name,email,password) VALUES ($1, $2,$3,$4) RETURNING *;'
-    pool.query(_sql, [data.id, data.name, data.email, data.password], (err, result) => {
+    let _sql = 'INSERT INTO users (id, name,email,created_at) VALUES ($1, $2,$3,$4) RETURNING *;'
+    pool.query(_sql, [data.id, data.name, data.email, data.created_at], (err, result) => {
       if (err) {
         console.error(err)
         res.status(500).json({ data: { message: '数据库插入错误' }, code: 500 })
@@ -29,7 +29,7 @@ const loginController = {
         const user = result.rows[0]
         res.status(200).json({
           message: '用户注册成功',
-          data: { id: user.id, name: user.name, mail: user.mail },
+          data: { id: user.id, name: user.name, email: user.email, created_at: user.created_at },
           code: 200,
         })
       }
@@ -38,7 +38,7 @@ const loginController = {
   //登录
   login: (req, res, next) => {
     const data = req.body
-    let _sql = 'SELECT * FROM users WHERE name = $1 AND password = $2;'
+    let _sql = 'SELECT id, name, email, created_at FROM users WHERE name = $1 AND password = $2;'
     pool.query(_sql, [data.name, data.password], (err, result) => {
       if (err) {
         console.error(err)
