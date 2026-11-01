@@ -16,7 +16,7 @@ const fileController = {
         console.error(err)
         res.status(500).json({ data: { error: '数据库查询错误' }, code: 500 })
       } else {
-        res.status(200).json({ data: result.rows, code: 200 })
+        res.status(200).json({ data: { files: result.rows, pageSize, pageNum }, code: 200 })
       }
     })
   },
@@ -28,7 +28,7 @@ const fileController = {
         console.error(err)
         res.status(500).json({ data: { error: '数据库查询错误' }, code: 500 })
       } else {
-        res.status(200).json({ data: result.rows[0].count, code: 200 })
+        res.status(200).json({ data: { total: Number(result.rows[0].count) }, code: 200 })
       }
     })
   },

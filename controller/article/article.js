@@ -62,7 +62,7 @@ const articleController = {
     const user = req.user.id // 当前登录用户id
     // 文章状态state=true=已发布，false=草稿
     if (data.state === undefined) {
-      return res.status(400).json({ data: { message: '发布状态参数错误' }, code: 400 })
+      return res.status(400).json({ code: 400, message: '发布状态参数错误', data: null })
     }
     let _sql = 'UPDATE articles SET state = $1 WHERE id = $2 AND user_id = $3;'
     pool.query(_sql, [data.state, data.id, user], (err, result) => {

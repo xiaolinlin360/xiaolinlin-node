@@ -4,7 +4,7 @@ import { generateToken, verifyToken } from '../../lib/jwt.js'
 //查询是否注册
 const loginController = {
   isRegistered: (req, res, next) => {
-    let _sql = 'SELECT * FROM users WHERE id = $1;'
+    let _sql = 'SELECT id, name, email FROM users WHERE id = $1;'
     pool.query(_sql, [req.body.id], (err, result) => {
       if (err) {
         console.error(err)
