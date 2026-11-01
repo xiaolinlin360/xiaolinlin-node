@@ -5,8 +5,12 @@ const articleController = {
   //获取文章
   getArticle: (req, res, next) => {
     const data = req.body || {}
-    const pageSize = Number(data.pageSize) || 10
-    const pageNum = Number(data.pageNum) || 1
+    let pageSize = Number(req.body.pageSize) || 10
+    let pageNum = Number(req.body.pageNum) || 1
+    if (pageNum < 1) pageNum = 1
+    if (pageSize < 1) pageSize = 10
+    if (pageSize > 100) pageSize = 100
+
     // 💡 核心修改：使用 LATERAL 关联标签表，并把标签聚合成 JSON 数组
     let sql = `
     SELECT 

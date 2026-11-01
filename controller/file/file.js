@@ -4,8 +4,12 @@ import { generateToken, verifyToken } from '../../lib/jwt.js'
 const fileController = {
   //获取文件（分页查询）
   getFile: (req, res, next) => {
-    const pageSize = req.body.pageSize || 10
-    const pageNum = req.body.pageNum || 1
+    let pageSize = Number(req.body.pageSize) || 10
+    let pageNum = Number(req.body.pageNum) || 1
+    if (pageNum < 1) pageNum = 1
+    if (pageSize < 1) pageSize = 10
+    if (pageSize > 100) pageSize = 100
+
     let _sql = 'SELECT * FROM files ORDER BY id DESC LIMIT $1 OFFSET $2;'
     pool.query(_sql, [pageSize, (pageNum - 1) * pageSize], (err, result) => {
       if (err) {
