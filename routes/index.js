@@ -132,30 +132,30 @@ export const deleteSubset = (app) => {
 }
 
 //获取标签
-export const getLabel = (app) => {
-  app.post('/label/getLabel', auth, (req, res) => {
-    serve.getLabel(req, res)
+export const getLabels = (app) => {
+  app.post('/label/getLabels', auth, (req, res) => {
+    serve.getLabels(req, res)
   })
 }
 
 //新建标签
-export const insertLabel = (app) => {
-  app.post('/label/insertLabel', auth, (req, res) => {
-    serve.insertLabel(req, res)
+export const insertLabels = (app) => {
+  app.post('/label/insertLabels', auth, (req, res) => {
+    serve.insertLabels(req, res)
   })
 }
 
 //修改标签
-export const updateLabel = (app) => {
-  app.post('/label/updateLabel', auth, (req, res) => {
-    serve.updateLabel(req, res)
+export const updateLabels = (app) => {
+  app.post('/label/updateLabels', auth, (req, res) => {
+    serve.updateLabels(req, res)
   })
 }
 
 //删除标签
-export const deleteLabel = (app) => {
-  app.post('/label/deleteLabel', auth, (req, res) => {
-    serve.deleteLabel(req, res)
+export const deleteLabels = (app) => {
+  app.post('/label/deleteLabels', auth, (req, res) => {
+    serve.deleteLabels(req, res)
   })
 }
 

@@ -26,7 +26,7 @@ const messageController = {
     pool.query(_sql, [user, pageSize, (pageNum - 1) * pageSize], (err, result) => {
       if (err) {
         console.error(err)
-        return res.status(500).json({ data: { error: '数据库查询错误' }, code: 500 })
+        return res.status(500).json({ data: { message: '数据库查询错误' }, code: 500 })
       }
       res.status(200).json({
         data: { messages: result.rows, pageSize, pageNum },
@@ -42,7 +42,7 @@ const messageController = {
     pool.query(_sql, [user], (err, result) => {
       if (err) {
         console.error(err)
-        res.status(500).json({ data: { error: '数据库查询错误' }, code: 500 })
+        res.status(500).json({ data: { message: '数据库查询错误' }, code: 500 })
       } else {
         const total = Number(result.rows[0].total)
         res.status(200).json({ data: { total: total }, code: 200 })
@@ -58,7 +58,7 @@ const messageController = {
     pool.query(_sql, [true, user, data.id, false], (err, result) => {
       if (err) {
         console.error(err)
-        res.status(500).json({ data: { error: '数据库更新错误' }, code: 500 })
+        res.status(500).json({ data: { message: '数据库更新错误' }, code: 500 })
       } else {
         if (result.rowCount > 0) {
           res

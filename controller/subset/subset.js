@@ -10,7 +10,7 @@ const subsetController = {
     pool.query(_sql, [data], (err, result) => {
       if (err) {
         console.error(err)
-        res.status(500).json({ data: { error: '数据库查询错误' }, code: 500 })
+        res.status(500).json({ data: { message: '数据库查询错误' }, code: 500 })
       } else {
         res.status(200).json({ data: result.rows, code: 200 })
       }
@@ -21,7 +21,7 @@ const subsetController = {
     const data = req.body
     const user = req.user.id //从token中获取用户id,后期用来校验博客主账号
     if (!data.category_id || !data.name) {
-      return res.status(400).json({ data: { error: '分组分类或名称不能为空' }, code: 400 })
+      return res.status(400).json({ data: { message: '分组分类或名称不能为空' }, code: 400 })
     }
     let _sql = 'INSERT INTO subsets (category_id, name) VALUES ($1, $2);'
     pool.query(_sql, [data.category_id, data.name], (err, result) => {
@@ -44,7 +44,7 @@ const subsetController = {
     const data = req.body
     const user = req.user.id //从token中获取用户id,后期用来校验博客主账号
     if (!data.id) {
-      return res.status(400).json({ data: { error: '分组名称不能为空' }, code: 400 })
+      return res.status(400).json({ data: { message: '分组名称不能为空' }, code: 400 })
     }
     let _sql = 'UPDATE subsets SET name = $1 WHERE id = $2;'
     pool.query(_sql, [data.name, data.id], (err, result) => {
@@ -70,7 +70,7 @@ const subsetController = {
         res.status(400).json({ data: { message: '分组下未删除的信息，不能删除' }, code: 400 })
       } else if (err) {
         console.error(err)
-        res.status(500).json({ data: { error: '数据库删除错误' }, code: 500 })
+        res.status(500).json({ data: { message: '数据库删除错误' }, code: 500 })
       } else {
         if (result.rowCount > 0) {
           res.status(200).json({ data: { message: '分组删除成功' }, code: 200 })

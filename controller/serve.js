@@ -1,12 +1,12 @@
 import pool from '../model/db.js'
-import loginController from '../controller/login/login.js'
-import commentController from '../controller/comment/comment.js'
-import messageController from '../controller/message/message.js'
-import articleController from '../controller/article/article.js'
-import subsetController from '../controller/subset/subset.js'
-import labelController from '../controller/label/label.js'
-import fileController from '../controller/file/file.js'
-import categoryController from '../controller/subset/category.js'
+import loginController from './login/login.js'
+import commentController from './comment/comment.js'
+import messageController from './message/message.js'
+import articleController from './article/article.js'
+import subsetController from './subset/subset.js'
+import labelController from './label/labels.js'
+import fileController from './file/file.js'
+import categoryController from './subset/category.js'
 
 const serve = {
   //登录注册
@@ -33,10 +33,10 @@ const serve = {
   updateSubset: subsetController.updateSubset,
   deleteSubset: subsetController.deleteSubset,
   //标签
-  getLabel: labelController.getLabel,
-  insertLabel: labelController.insertLabel,
-  updateLabel: labelController.updateLabel,
-  deleteLabel: labelController.deleteLabel,
+  getLabels: labelController.getLabels,
+  insertLabels: labelController.insertLabels,
+  updateLabels: labelController.updateLabels,
+  deleteLabels: labelController.deleteLabels,
   //文件
   getFile: fileController.getFile,
   getTotalFile: fileController.getTotalFile,

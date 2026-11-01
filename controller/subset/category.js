@@ -7,7 +7,7 @@ const categoryController = {
     pool.query(_sql, (err, result) => {
       if (err) {
         console.error(err)
-        res.status(500).json({ data: { error: '数据库查询错误' }, code: 500 })
+        res.status(500).json({ data: { message: '数据库查询错误' }, code: 500 })
       } else {
         res.status(200).json({ data: result.rows, code: 200 })
       }

@@ -8,9 +8,8 @@ const loginController = {
     pool.query(_sql, [req.body.id], (err, result) => {
       if (err) {
         console.error(err)
-        res.status(500).json({ data: { error: '数据库查询错误' }, code: 500 })
-      }
-      if (result.rows.length > 0) {
+        res.status(500).json({ data: { message: '数据库查询错误' }, code: 500 })
+      } else if (result.rows.length > 0) {
         console.log(result)
         res.status(200).json({ data: { registered: true, users: result.rows }, code: 200 })
       } else {
@@ -21,11 +20,11 @@ const loginController = {
   //注册用户
   insertUser: (req, res, next) => {
     const data = req.body
-    let _sql = 'INSERT INTO users (id, name,mail,password) VALUES ($1, $2,$3,$4) RETURNING *;'
-    pool.query(_sql, [data.id, data.name, data.mail, data.password], (err, result) => {
+    let _sql = 'INSERT INTO users (id, name,email,password) VALUES ($1, $2,$3,$4) RETURNING *;'
+    pool.query(_sql, [data.id, data.name, data.email, data.password], (err, result) => {
       if (err) {
         console.error(err)
-        res.status(500).json({ data: { error: '数据库插入错误' }, code: 500 })
+        res.status(500).json({ data: { message: '数据库插入错误' }, code: 500 })
       } else {
         const user = result.rows[0]
         res.status(200).json({
@@ -43,11 +42,10 @@ const loginController = {
     pool.query(_sql, [data.name, data.password], (err, result) => {
       if (err) {
         console.error(err)
-        res.status(500).json({ data: { error: '数据库查询错误' }, code: 500 })
+        res.status(500).json({ data: { message: '数据库查询错误' }, code: 500 })
       } else {
         if (result.rows.length > 0) {
           const user = result.rows[0]
-          // 生成token
           const token = generateToken(user.id, user.name)
           res
             .status(200)

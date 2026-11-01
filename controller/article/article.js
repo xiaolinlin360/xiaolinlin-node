@@ -31,7 +31,7 @@ const articleController = {
       paramIndex++
     }
     // 动态追加分页（原有逻辑完全不需要动）
-    sql += ` ORDER BY articles.id LIMIT $${paramIndex} OFFSET $${paramIndex + 1};`
+    sql += ` ORDER BY created_at DESC LIMIT $${paramIndex} OFFSET $${paramIndex + 1};`
     params.push(pageSize, (pageNum - 1) * pageSize)
     pool.query(sql, params, (err, result) => {
       if (err) {
@@ -47,7 +47,7 @@ const articleController = {
     pool.query(_sql, (err, result) => {
       if (err) {
         console.error(err)
-        res.status(500).json({ data: { error: '数据库查询错误' }, code: 500 })
+        res.status(500).json({ data: { message: '数据库查询错误' }, code: 500 })
       } else {
         const total = Number(result.rows[0].total)
         res.status(200).json({ data: { total: total }, code: 200 })
@@ -102,6 +102,8 @@ const articleController = {
       }
     })
   },
+
+  //发布文章之后再做
 }
 
 export default articleController

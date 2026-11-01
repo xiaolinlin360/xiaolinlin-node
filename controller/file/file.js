@@ -6,7 +6,7 @@ const fileController = {
   getFile: (req, res, next) => {
     const pageSize = req.body.pageSize || 10
     const pageNum = req.body.pageNum || 0
-    let _sql = 'SELECT * FROM file ORDER BY id DESC LIMIT $1 OFFSET $2;'
+    let _sql = 'SELECT * FROM files ORDER BY id DESC LIMIT $1 OFFSET $2;'
     pool.query(_sql, [pageSize, (pageNum - 1) * pageSize], (err, result) => {
       if (err) {
         console.error(err)
@@ -18,7 +18,7 @@ const fileController = {
   },
   //获取文件总数（后面需要微调，还有文件分类那些都没写）
   getTotalFile: (req, res, next) => {
-    let _sql = 'SELECT COUNT(*) FROM file;'
+    let _sql = 'SELECT COUNT(*) FROM files;'
     pool.query(_sql, (err, result) => {
       if (err) {
         console.error(err)
@@ -32,7 +32,7 @@ const fileController = {
   //移动文件到不同的分类（修改subset id）
   moveFile: (req, res, next) => {
     const data = req.body
-    let _sql = 'UPDATE file SET subset_id = $1 WHERE id = $2;'
+    let _sql = 'UPDATE files SET subset_id = $1 WHERE id = $2;'
     pool.query(_sql, [data.subset_id, data.id], (err, result) => {
       if (err) {
         console.error(err)
