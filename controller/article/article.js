@@ -5,44 +5,74 @@ const articleController = {
   //获取文章
   getArticle: (req, res, next) => {
     const data = req.body || {}
-    let pageSize = Number(req.body.pageSize) || 10
-    let pageNum = Number(req.body.pageNum) || 1
+
+    let pageSize = Number(data.pageSize) || 10
+    let pageNum = Number(data.pageNum) || 1
     if (pageNum < 1) pageNum = 1
     if (pageSize < 1) pageSize = 10
     if (pageSize > 100) pageSize = 100
 
-    // 💡 核心修改：使用 LATERAL 关联标签表，并把标签聚合成 JSON 数组
-    let sql = `
-    SELECT 
-      articles.*, 
-      users.name AS username_name,
-      COALESCE(t.labels, '[]') AS labels
-    FROM articles 
-    LEFT JOIN users ON articles.user_id = users.id 
+    const subsetId = data.subset_id && data.subset_id !== '' ? data.subset_id : null
+
+    const sql = `
+    WITH paged AS (
+      SELECT *
+      FROM articles
+      WHERE ($3::uuid IS NULL OR subset_id = $3::uuid)
+      ORDER BY created_at DESC
+      LIMIT $1 OFFSET $2
+    )
+    SELECT
+      a.id,
+      a.state,
+      a.title,
+      a.content,
+      a.user_id,
+      f.url AS url,               -- 通过 cover_file_id 拿到的封面 URL
+      COALESCE(tf.file_urls, '[]'::json) AS file_urls, -- 聚合的文件ID数组或URL数组
+      a.introduce,
+      a.subset_id,
+      a.created_at,
+      u.name AS username_name,
+      COALESCE(tl.labels, '[]'::json) AS labels
+    FROM paged a
+    -- 1. 关联封面文件
+    LEFT JOIN files f ON f.id = a.cover_file_id  
+    -- 2. 关联用户
+    LEFT JOIN users u ON u.id = a.user_id        
+    -- 3. 聚合该文章关联的所有文件 (通过 files.article_id)
     LEFT JOIN LATERAL (
-      SELECT JSON_AGG(JSON_BUILD_OBJECT('id', l.id, 'label_name', l.label_name)) AS labels
+      SELECT json_agg(f_sub.id ORDER BY f_sub.created_at) AS file_urls
+      FROM files f_sub
+      WHERE f_sub.article_id = a.id
+    ) tf ON TRUE
+    -- 4. 聚合标签
+    LEFT JOIN LATERAL (
+      SELECT json_agg(
+               json_build_object('id', l.id, 'label_name', l.label_name)
+               ORDER BY l.id
+             ) AS labels
       FROM article_label al
-      JOIN labels l ON al.label_id = l.id
-      WHERE al.article_id = articles.id
-    ) t ON true
+      JOIN labels l ON l.id = al.label_id        
+      WHERE al.article_id = a.id
+    ) tl ON TRUE
+    ORDER BY a.created_at DESC
   `
-    const params = []
-    let paramIndex = 1
-    // 原有条件判断
-    if (data.subset_id !== undefined && data.subset_id !== null && data.subset_id !== '') {
-      sql += `WHERE articles.subset_id = $${paramIndex} `
-      params.push(data.subset_id)
-      paramIndex++
-    }
-    // 动态追加分页（原有逻辑完全不需要动）
-    sql += ` ORDER BY created_at DESC LIMIT $${paramIndex} OFFSET $${paramIndex + 1};`
-    params.push(pageSize, (pageNum - 1) * pageSize)
+
+    const params = [pageSize, (pageNum - 1) * pageSize, subsetId]
+
     pool.query(sql, params, (err, result) => {
       if (err) {
-        console.error(err)
-        return res.status(500).json({ data: { message: '数据库查询错误' }, code: 500 })
+        console.error('SQL Error:', err)
+        return res.status(500).json({
+          data: { message: '数据库查询错误' },
+          code: 500,
+        })
       }
-      res.status(200).json({ data: { articles: result.rows, pageSize, pageNum }, code: 200 })
+      res.status(200).json({
+        data: { articles: result.rows, pageSize, pageNum },
+        code: 200,
+      })
     })
   },
   //获取文章总数

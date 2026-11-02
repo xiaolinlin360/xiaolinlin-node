@@ -10,7 +10,7 @@ const fileController = {
     if (pageSize < 1) pageSize = 10
     if (pageSize > 100) pageSize = 100
 
-    let _sql = 'SELECT * FROM files ORDER BY id DESC LIMIT $1 OFFSET $2;'
+    let _sql = 'SELECT * FROM files created_at BY id DESC LIMIT $1 OFFSET $2;'
     pool.query(_sql, [pageSize, (pageNum - 1) * pageSize], (err, result) => {
       if (err) {
         console.error(err)

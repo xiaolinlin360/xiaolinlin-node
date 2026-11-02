@@ -1,4 +1,4 @@
-// 模拟前端发送请求
+// // 模拟前端发送请求
 // fetch('http://localhost:3001/user/login', {
 //   method: 'post',
 //   headers: {
@@ -35,7 +35,7 @@
 // 用张三的号去登录
 
 const token =
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjExMTExMTExLTExMTEtMTExMS0xMTExLTExMTExMTExMTExMSIsIm5hbWUiOiLljZrkuLtBIiwiaWF0IjoxNzkzMDE0Njk4LCJleHAiOjE3OTM2MTk0OTh9.DKpuCpRC43C4PYouhMFxTy4qHH_sJnl11Qtba11vU50'
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjExMTExMTExLTExMTEtMTExMS0xMTExLTExMTExMTExMTExMSIsIm5hbWUiOiLljZrkuLtBIiwiaWF0IjoxNzkzNjIzMjg2LCJleHAiOjE3OTQyMjgwODZ9.-nRVzTzbeNGi6tI83lz39TYLiS7y7f64hYeeriIDiGg'
 fetch('http://localhost:3001/article/getArticle', {
   method: 'POST',
   headers: {
