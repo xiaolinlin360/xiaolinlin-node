@@ -36,14 +36,16 @@
 
 const token =
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjExMTExMTExLTExMTEtMTExMS0xMTExLTExMTExMTExMTExMSIsIm5hbWUiOiLljZrkuLtBIiwiaWF0IjoxNzkzNjIzMjg2LCJleHAiOjE3OTQyMjgwODZ9.-nRVzTzbeNGi6tI83lz39TYLiS7y7f64hYeeriIDiGg'
-fetch('http://localhost:3001/labels/getLabels', {
+fetch('http://localhost:3001/files/getFile', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
     Authorization: `Bearer ${token}`,
   },
   body: JSON.stringify({
-    keyword: '',
+    pageNum: 1,
+    pageSize: 10,
+    file_urls: ['f1111111-1111-1111-1111-111111111111'],
   }),
 })
   .then((res) => res.json())

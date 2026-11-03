@@ -161,21 +161,21 @@ export const deleteLabels = (app) => {
 
 //获取文件（分页查询）
 export const getFile = (app) => {
-  app.post('/getFile', auth, (req, res) => {
+  app.post('/files/getFile', auth, (req, res) => {
     serve.getFile(req, res)
   })
 }
 
 //获取文件总数
 export const getTotalFile = (app) => {
-  app.post('/getTotalFile', auth, (req, res) => {
+  app.post('/files/getTotalFile', auth, (req, res) => {
     serve.getTotalFile(req, res)
   })
 }
 
 //移动文件到不同的分类（修改subset id）
 // export const moveFile = (app) => {
-//   app.post('/moveFile', auth, (req, res) => {
+//   app.post('/files/moveFile', auth, (req, res) => {
 //     serve.moveFile(req, res)
 //   })
 // }
