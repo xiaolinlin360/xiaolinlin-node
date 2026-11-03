@@ -44,7 +44,7 @@ const fileController = {
     pool.query(_sql, queryParams, (err, result) => {
       if (err) {
         console.error(err)
-        res.status(500).json({ data: { error: '数据库查询错误' }, code: 500 })
+        res.status(500).json({ data: { message: '数据库查询错误' }, code: 500 })
       } else {
         res.status(200).json({
           data: { files: result.rows, pageSize, pageNum },
@@ -53,15 +53,35 @@ const fileController = {
       }
     })
   },
-  //获取文件总数（后面需要微调，还有文件分类那些都没写）
+  //获取文件总数（支持与 getFile 相同的 id 过滤，保证分页器总数一致）
   getTotalFile: (req, res, next) => {
-    let _sql = 'SELECT COUNT(*) FROM files;'
+    let fileUrls = req.body?.file_urls
+
+    // 与 getFile 完全一致的过滤口径：单值转数组、空数组直接返回 0
+    if (fileUrls !== undefined && fileUrls !== null && fileUrls !== '') {
+      if (!Array.isArray(fileUrls)) fileUrls = [fileUrls]
+      if (fileUrls.length === 0) {
+        return res.status(200).json({ data: { total: 0 }, code: 200 })
+      }
+      let _sql = 'SELECT COUNT(*)::int AS total FROM files WHERE id = ANY($1);'
+      pool.query(_sql, [fileUrls], (err, result) => {
+        if (err) {
+          console.error(err)
+          res.status(500).json({ data: { message: '数据库查询错误' }, code: 500 })
+        } else {
+          res.status(200).json({ data: { total: result.rows[0].total }, code: 200 })
+        }
+      })
+      return
+    }
+
+    let _sql = 'SELECT COUNT(*)::int AS total FROM files;'
     pool.query(_sql, (err, result) => {
       if (err) {
         console.error(err)
-        res.status(500).json({ data: { error: '数据库查询错误' }, code: 500 })
+        res.status(500).json({ data: { message: '数据库查询错误' }, code: 500 })
       } else {
-        res.status(200).json({ data: { total: Number(result.rows[0].count) }, code: 200 })
+        res.status(200).json({ data: { total: result.rows[0].total }, code: 200 })
       }
     })
   },

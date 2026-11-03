@@ -11,7 +11,7 @@ const dbTables = {
         name TEXT NOT NULL,
         email TEXT UNIQUE,
         password TEXT NOT NULL,
-        imgurl TEXT, -- 头像路径
+        imgurl VARCHAR(255) DEFAULT '', -- 头像路径
         is_deleted bool NOT NULL DEFAULT FALSE, -- 是否删除(默认未删除false)
         created_at TIMESTAMP DEFAULT NOW()
     );
@@ -21,6 +21,7 @@ const dbTables = {
     CREATE TABLE IF NOT EXISTS category (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid (),
         name TEXT NOT NULL,
+        path VARCHAR(255) NOT NULL DEFAULT '', -- 前端路由路径(如 /blog)，前端靠它反查 category_id
         created_at TIMESTAMP DEFAULT NOW()
     );
   `,
@@ -43,6 +44,7 @@ const dbTables = {
         type TEXT NOT NULL, -- 文件类型
         size TEXT NOT NULL, -- 文件大小
         url TEXT NOT NULL, -- 文件路径
+        article_id UUID, -- 所属文章id（附件）。外键不能内联：files 先建、articles 后建，在 create() 里补
         created_at TIMESTAMP DEFAULT NOW(),
         CONSTRAINT fk_files_user_id_to_users_id FOREIGN KEY (user_id) REFERENCES users (id)
     );
@@ -54,15 +56,14 @@ const dbTables = {
         subset_id UUID NOT NULL, -- 子集id
         title VARCHAR(40) NOT NULL,
         introduce VARCHAR(400) NOT NULL, -- 介绍
-        file_id UUID, -- 文件id
         cover_file_id UUID, -- 封面文件id
         state bool NOT NULL DEFAULT FALSE, -- 状态(是否发布,默认不发布false)
         content TEXT NOT NULL, -- 内容
         created_at TIMESTAMP DEFAULT NOW(),
         CONSTRAINT fk_articles_user_id_to_users_id FOREIGN KEY (user_id) REFERENCES users (id),
         CONSTRAINT fk_articles_subset_id_to_subsets_id FOREIGN KEY (subset_id) REFERENCES subsets (id),
-        CONSTRAINT fk_articles_file_id_to_files_id FOREIGN KEY (file_id) REFERENCES files (id),
-        CONSTRAINT fk_articles_cover_file_id_to_files_id FOREIGN KEY (cover_file_id) REFERENCES files (id)
+        CONSTRAINT fk_articles_cover_file FOREIGN KEY (cover_file_id) REFERENCES files (id)
+            ON UPDATE CASCADE ON DELETE SET NULL
     );
   `,
 
@@ -118,6 +119,9 @@ const dbTables = {
         send_user_id UUID NOT NULL, -- 发送用户id
         receiver_user_id UUID NOT NULL, -- 接收用户id
         content TEXT NOT NULL, -- 内容
+        is_read BOOLEAN NOT NULL DEFAULT FALSE, -- 是否已读
+        msg_type SMALLINT NOT NULL DEFAULT 0, -- 消息类型(0文本 1图片 ...)
+        sender_imgurl VARCHAR(255) NOT NULL DEFAULT '', -- 冗余的发送者头像(列表直接取，免联表)
         created_at TIMESTAMP DEFAULT NOW(),
         CONSTRAINT fk_messages_send_user_id_to_users_id FOREIGN KEY (send_user_id) REFERENCES users (id),
         CONSTRAINT fk_messages_receiver_user_id_to_users_id FOREIGN KEY (receiver_user_id) REFERENCES users (id)
@@ -132,6 +136,24 @@ export const create = async () => {
   for (const table of Object.values(dbTables)) {
     await pool.query(table) // 用连接池执行建表语句
   }
+
+  // files.article_id -> articles.id 是循环依赖（files 先建、articles 后建），
+  // 所以只能等所有表建好后在这里补外键。约束已存在则跳过，保证可重复执行。
+  await pool.query(`
+    DO $$
+    BEGIN
+      IF NOT EXISTS (
+        SELECT 1 FROM pg_constraint
+        WHERE conname = 'fk_files_article' AND conrelid = 'files'::regclass
+      ) THEN
+        ALTER TABLE files
+          ADD CONSTRAINT fk_files_article
+          FOREIGN KEY (article_id) REFERENCES articles (id)
+          ON UPDATE CASCADE ON DELETE CASCADE;
+      END IF;
+    END $$;
+  `)
+
   console.log('所有表创建完成')
 }
 export default pool
