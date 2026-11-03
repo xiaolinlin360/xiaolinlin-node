@@ -1,17 +1,27 @@
 import pool from '../../model/db.js'
-import { generateToken, verifyToken } from '../../lib/jwt.js'
+
+/** 根据 keyword 生成查询语句与参数（纯函数，便于单测） */
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+function buildLabelsQuery(keyword = '') {
+  const kw = String(keyword).trim()
+  if (!kw) return { sql: 'SELECT * FROM labels ORDER BY id ASC', values: [] }
+  const byId = UUID_RE.test(kw)
+  return {
+    sql: `SELECT * FROM labels WHERE ${byId ? 'id = $1' : 'label_name ILIKE $1'} ORDER BY id ASC`,
+    values: [byId ? kw : `%${kw}%`],
+  }
+}
 const labelController = {
   //获取所有标签
-  getLabels: (req, res, next) => {
-    let _sql = 'SELECT * FROM labels;'
-    pool.query(_sql, (err, result) => {
-      if (err) {
-        console.error(err)
-        res.status(500).json({ data: { message: '数据库查询错误' }, code: 500 })
-      } else {
-        res.status(200).json({ data: result.rows, code: 200 })
-      }
-    })
+  getLabels: async (req, res, next) => {
+    const { sql, values } = buildLabelsQuery(req.body?.keyword ?? req.query?.keyword)
+    try {
+      const { rows } = await pool.query(sql, values)
+      res.status(200).json({ data: rows, code: 200 })
+    } catch (err) {
+      console.error(err)
+      res.status(500).json({ data: { message: '数据库查询错误' }, code: 500 })
+    }
   },
 
   //新建标签
