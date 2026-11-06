@@ -7,6 +7,7 @@ import subsetController from './subset/subset.js'
 import labelController from './label/labels.js'
 import fileController from './file/file.js'
 import categoryController from './subset/category.js'
+import galleryController from './gallerys/gallerys.js'
 
 const serve = {
   //登录注册
@@ -40,6 +41,10 @@ const serve = {
   //文件
   getFile: fileController.getFile,
   getTotalFile: fileController.getTotalFile,
+  //画廊
+  getGallery: galleryController.getGallery,
+  getTotalGallery: galleryController.getTotalGallery,
+  deleteGallery: galleryController.deleteGallery,
   // moveFile: fileController.moveFile,
   //获取日记diary（分页查询）（模糊查询那些后面在做）
   getDiary: (req, res, next) => {

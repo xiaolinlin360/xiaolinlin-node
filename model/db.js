@@ -36,19 +36,31 @@ const dbTables = {
     );
   `,
 
+  // ① 新增：画廊表（无依赖，放最前面）
+  gallerys: `
+    CREATE TABLE IF NOT EXISTS gallerys (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid (),
+        title TEXT NOT NULL,
+        created_at TIMESTAMP DEFAULT NOW()
+    );
+`,
+
+  // ② files 表增加 gallery_id 并补外键
   files: `
     CREATE TABLE IF NOT EXISTS files (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid (),
-        user_id UUID NOT NULL, -- 上传用户id
+        user_id UUID NOT NULL,               -- 上传用户id
         file_name TEXT NOT NULL,
-        type TEXT NOT NULL, -- 文件类型
-        size TEXT NOT NULL, -- 文件大小
-        url TEXT NOT NULL, -- 文件路径
-        article_id UUID, -- 所属文章id（附件）。外键不能内联：files 先建、articles 后建，在 create() 里补
+        type TEXT NOT NULL,                  -- 文件类型
+        size TEXT NOT NULL,                  -- 文件大小
+        url TEXT NOT NULL,                   -- 文件路径
+        article_id UUID,                     -- 所属文章id（附件）。外键不能内联：files 先建、articles 后建，在 create() 里补
+        gallery_id UUID,                     -- 所属画廊id
         created_at TIMESTAMP DEFAULT NOW(),
-        CONSTRAINT fk_files_user_id_to_users_id FOREIGN KEY (user_id) REFERENCES users (id)
+        CONSTRAINT fk_files_user_id_to_users_id     FOREIGN KEY (user_id)    REFERENCES users (id),
+        CONSTRAINT fk_files_gallery_id_to_gallerys_id FOREIGN KEY (gallery_id) REFERENCES gallerys (id)
     );
-  `,
+`,
   articles: `
     CREATE TABLE IF NOT EXISTS articles (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid (),

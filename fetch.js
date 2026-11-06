@@ -36,16 +36,14 @@
 
 const token =
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjExMTExMTExLTExMTEtMTExMS0xMTExLTExMTExMTExMTExMSIsIm5hbWUiOiLljZrkuLtBIiwiaWF0IjoxNzkzNjIzMjg2LCJleHAiOjE3OTQyMjgwODZ9.-nRVzTzbeNGi6tI83lz39TYLiS7y7f64hYeeriIDiGg'
-fetch('http://localhost:3001/files/getFile', {
+fetch('http://localhost:3001/gallerys/deleteGallery', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
     Authorization: `Bearer ${token}`,
   },
   body: JSON.stringify({
-    pageNum: 1,
-    pageSize: 10,
-    file_urls: ['f1111111-1111-1111-1111-111111111111'],
+    id: '37d88271-c5fe-4d54-9727-046863d530e8',
   }),
 })
   .then((res) => res.json())

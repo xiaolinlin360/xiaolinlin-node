@@ -180,6 +180,25 @@ export const getTotalFile = (app) => {
 //   })
 // }
 
+//画廊
+export const getGallery = (app) => {
+  app.post('/gallerys/getGallery', auth, (req, res) => {
+    serve.getGallery(req, res)
+  })
+}
+//获取画廊总数
+export const getTotalGallery = (app) => {
+  app.post('/gallerys/getTotalGallery', auth, (req, res) => {
+    serve.getTotalGallery(req, res)
+  })
+}
+//删除画廊
+export const deleteGallery = (app) => {
+  app.post('/gallerys/deleteGallery', auth, (req, res) => {
+    serve.deleteGallery(req, res)
+  })
+}
+
 //获取日记diary（分页查询）
 export const getDiary = (app) => {
   app.post('/getDiary', auth, (req, res) => {
