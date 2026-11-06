@@ -2,40 +2,38 @@ import pool from '../../model/db.js'
 
 const fileController = {
   //获取文件（分页查询）
+  //获取文件（分页查询）
   getFile: (req, res, next) => {
     let pageSize = Number(req.body.pageSize) || 10
     let pageNum = Number(req.body.pageNum) || 1
     let fileUrls = req.body.file_urls
+
     if (pageNum < 1) pageNum = 1
     if (pageSize < 1) pageSize = 10
     if (pageSize > 100) pageSize = 100
-
-    // 构建 SQL 和 参数数组
     let _sql = 'SELECT * FROM files'
     let queryParams = []
-
-    // 1. 处理 file_urls 过滤条件
+    // 1. 处理 file_urls：去掉所有符号 → 只保留十六进制 → 按 32 位切成 UUID
     if (fileUrls !== undefined && fileUrls !== null && fileUrls !== '') {
-      // 如果传的是单个字符串，转成数组
-      if (!Array.isArray(fileUrls)) {
-        fileUrls = [fileUrls]
-      }
-
-      // 如果传的是空数组，直接返回空结果，不用查数据库了
-      if (fileUrls.length === 0) {
+      const hex = String(fileUrls)
+        .toLowerCase()
+        .replace(/[^0-9a-f]/g, '')
+      const ids = (hex.match(/.{32}/g) || []).map(
+        (s) =>
+          `${s.slice(0, 8)}-${s.slice(8, 12)}-${s.slice(12, 16)}-${s.slice(16, 20)}-${s.slice(20)}`
+      )
+      if (ids.length === 0) {
         return res.status(200).json({
           data: { files: [], pageSize, pageNum },
           code: 200,
         })
       }
-
-      // PostgreSQL 支持直接对数组使用 ANY，完美兼容单值/多值匹配
-      queryParams.push(fileUrls)
-      _sql += ` WHERE id = ANY($${queryParams.length})`
+      queryParams.push(ids)
+      _sql += ` WHERE id = ANY($${queryParams.length}::uuid[])`
     }
-
-    // 2. 排序 (修复了原代码 created_at BY 的语法错误)
+    // 2. 排序
     _sql += ' ORDER BY created_at DESC, id DESC'
+    // 3. 分页
     queryParams.push(pageSize)
     _sql += ` LIMIT $${queryParams.length}`
     queryParams.push((pageNum - 1) * pageSize)

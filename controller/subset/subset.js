@@ -4,10 +4,23 @@ import { generateToken, verifyToken } from '../../lib/jwt.js'
 const subsetController = {
   //获取分组(单个人的博客，只有单个人的分组所以直接拿到表)
   getSubset: (req, res, next) => {
-    const user = req.user.id //从token中获取用户id,后期用来校验博客主账号
-    let data = req.body.category_id
-    let _sql = 'SELECT * FROM subsets WHERE category_id = $1;'
-    pool.query(_sql, [data], (err, result) => {
+    const user = req.user.id // 从token中获取用户id
+    const category_id = req.body.category_id
+    const keyword = req.body.keyword // 新增接收 keyword
+    let _sql = 'SELECT * FROM subsets WHERE category_id = $1'
+    let queryParams = [category_id]
+
+    // 如果存在关键字，则追加模糊查询条件
+    if (keyword && String(keyword).trim() !== '') {
+      // 使用 ILIKE 不区分大小写匹配，并加上 % 通配符
+      _sql += ` AND name ILIKE $${queryParams.length + 1}`
+      queryParams.push(`%${String(keyword).trim()}%`)
+    }
+
+    // 顺便加上一个排序，让新创建的在前面（按需保留）
+    _sql += ' ORDER BY created_at DESC'
+
+    pool.query(_sql, queryParams, (err, result) => {
       if (err) {
         console.error(err)
         res.status(500).json({ data: { message: '数据库查询错误' }, code: 500 })
