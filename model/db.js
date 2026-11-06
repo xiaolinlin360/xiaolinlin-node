@@ -41,7 +41,11 @@ const dbTables = {
     CREATE TABLE IF NOT EXISTS gallerys (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid (),
         title TEXT NOT NULL,
-        created_at TIMESTAMP DEFAULT NOW()
+        subset_id UUID NOT NULL,  -- 子集id
+        created_at TIMESTAMP DEFAULT NOW(),
+        CONSTRAINT fk_gallerys_subset_id_to_subsets_id
+            FOREIGN KEY (subset_id) REFERENCES subsets (id)
+            ON DELETE CASCADE               -- 按需：CASCADE / RESTRICT / SET NULL
     );
 `,
 
