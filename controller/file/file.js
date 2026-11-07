@@ -1,7 +1,7 @@
 import pool from '../../model/db.js'
+import crypto from 'node:crypto' // 引入 crypto 兜底
 
 const fileController = {
-  //获取文件（分页查询）
   //获取文件（分页查询）
   getFile: (req, res, next) => {
     let pageSize = Number(req.body.pageSize) || 10
@@ -82,6 +82,47 @@ const fileController = {
         res.status(200).json({ data: { total: result.rows[0].total }, code: 200 })
       }
     })
+  },
+  // 上传文件
+  uploadFile: async (req, res) => {
+    if (!req.file) {
+      return res.status(400).json({ data: { message: '未接收到文件' }, code: 400 })
+    }
+
+    // 1. 获取自动生成的 id 和文件信息
+    const id = crypto.randomUUID()
+    const { filename, mimetype, size } = req.file
+
+    // 2. 获取可选参数与用户 ID (user_id 请根据你的鉴权中间件调整，如 req.user.id)
+    const { article_id, gallery_id, user_id } = req.body
+
+    // 3. 拼接可直接访问的 URL (自动处理中文/空格编码)
+    const url = `${req.protocol}://${req.get('host')}/data/${id}/${encodeURIComponent(filename)}`
+
+    // 4. 插入数据库 (利用 RETURNING * 直接拿到完整数据返回给前端)
+    const _sql = `
+      INSERT INTO files (id, user_id, file_name, type, size, url, article_id, gallery_id) 
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8) 
+      RETURNING *
+    `
+    const params = [
+      id,
+      user_id || null,
+      filename,
+      mimetype,
+      size, // 截图里 size 是 text，传数字过去 PG 会自动转
+      url,
+      article_id || null,
+      gallery_id || null,
+    ]
+
+    try {
+      const result = await pool.query(_sql, params)
+      res.status(200).json({ data: result.rows[0], code: 200 })
+    } catch (err) {
+      console.error('文件上传入库失败:', err)
+      res.status(500).json({ data: { message: '数据库插入错误' }, code: 500 })
+    }
   },
   //文件删除和修改后面在做吧
   //移动文件到不同的分类（修改subset id）

@@ -1,5 +1,8 @@
 import serve from '../controller/serve.js'
 import { auth } from '../lib/auth.js'
+import multer from 'multer'
+// 创建 upload 实例（最简单的内存存储写法）
+const upload = multer({ dest: 'uploads/' })
 
 //req 请求对象，res 响应对象，next 中间件函数
 export const hi = (app) => {
@@ -170,6 +173,13 @@ export const getFile = (app) => {
 export const getTotalFile = (app) => {
   app.post('/files/getTotalFile', auth, (req, res) => {
     serve.getTotalFile(req, res)
+  })
+}
+
+//上传文件
+export const uploadFile = (app) => {
+  app.post('/files/uploadFile', auth, upload.single('file'), (req, res) => {
+    serve.uploadFile(req, res)
   })
 }
 

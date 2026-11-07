@@ -3,6 +3,7 @@ import express from 'express'
 import cors from 'cors'
 import * as routes from './routes/index.js'
 import { create } from './model/db.js'
+import { DATA_DIR } from './config/data.js'
 create()
 const app = express()
 const port = config.port
@@ -23,7 +24,7 @@ app.use(
 )
 
 // 静态文件目录
-app.use(express.static(import.meta.dirname + '/data'))
+app.use('/data', express.static(DATA_DIR, { fallthrough: false }))
 
 //解析前端数据
 app.use(express.json())
