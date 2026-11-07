@@ -48,7 +48,18 @@ const dbTables = {
             ON DELETE CASCADE               -- 按需：CASCADE / RESTRICT / SET NULL
     );
 `,
-
+  notes: `
+    CREATE TABLE IF NOT EXISTS notes (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid (),
+        title TEXT NOT NULL,
+        content TEXT NOT NULL, --存储md格式的内容
+        subset_id UUID NOT NULL, -- 子集id
+        created_at TIMESTAMP DEFAULT NOW(),
+        CONSTRAINT fk_notes_subset_id_to_subsets_id 
+          FOREIGN KEY (subset_id) REFERENCES subsets (id) 
+          ON DELETE CASCADE                -- 按需：CASCADE / RESTRICT / SET NULL
+    );
+`,
   // ② files 表增加 gallery_id 并补外键
   files: `
     CREATE TABLE IF NOT EXISTS files (

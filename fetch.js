@@ -36,15 +36,13 @@
 
 const token =
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjExMTExMTExLTExMTEtMTExMS0xMTExLTExMTExMTExMTExMSIsIm5hbWUiOiLljZrkuLtBIiwiaWF0IjoxNzkzNjIzMjg2LCJleHAiOjE3OTQyMjgwODZ9.-nRVzTzbeNGi6tI83lz39TYLiS7y7f64hYeeriIDiGg'
-fetch('http://localhost:3001/gallerys/getTotalGallery', {
+fetch('http://localhost:3001/notes/getNotes', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
     Authorization: `Bearer ${token}`,
   },
-  body: JSON.stringify({
-    subaset_id: '7e6111d3-5406-46d2-b8c5-4156cadbd985',
-  }),
+  body: JSON.stringify({}),
 })
   .then((res) => res.json())
   .then((json) => console.dir(json, { depth: null }))

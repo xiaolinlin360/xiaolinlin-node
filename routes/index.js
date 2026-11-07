@@ -209,16 +209,35 @@ export const deleteGallery = (app) => {
   })
 }
 
-//获取日记diary（分页查询）
-export const getDiary = (app) => {
-  app.post('/getDiary', auth, (req, res) => {
-    serve.getDiary(req, res)
+//笔记
+//获取笔记（分页查询）
+export const getNotes = (app) => {
+  app.post('/notes/getNotes', auth, (req, res) => {
+    serve.getNotes(req, res)
   })
 }
-//获取日记总数
-export const getTotalDiary = (app) => {
-  app.post('/getTotalDiary', auth, (req, res) => {
-    serve.getTotalDiary(req, res)
+//获取笔记总数
+export const getTotalNotes = (app) => {
+  app.post('/notes/getTotalNotes', auth, (req, res) => {
+    serve.getTotalNotes(req, res)
+  })
+}
+//新建笔记
+export const insertNotes = (app) => {
+  app.post('/notes/insertNotes', auth, (req, res) => {
+    serve.insertNotes(req, res)
+  })
+}
+//修改笔记
+export const updateNotes = (app) => {
+  app.post('/notes/updateNotes', auth, (req, res) => {
+    serve.updateNotes(req, res)
+  })
+}
+//删除笔记
+export const deleteNotes = (app) => {
+  app.post('/notes/deleteNotes', auth, (req, res) => {
+    serve.deleteNotes(req, res)
   })
 }
 

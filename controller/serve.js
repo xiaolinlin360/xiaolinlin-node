@@ -8,6 +8,7 @@ import labelController from './label/labels.js'
 import fileController from './file/file.js'
 import categoryController from './subset/category.js'
 import galleryController from './gallerys/gallerys.js'
+import notesController from './notes/notes.js'
 
 const serve = {
   //登录注册
@@ -45,6 +46,12 @@ const serve = {
   getGallery: galleryController.getGallery,
   getTotalGallery: galleryController.getTotalGallery,
   deleteGallery: galleryController.deleteGallery,
+  //笔记
+  getNotes: notesController.getNotes,
+  updateNotes: notesController.updateNotes,
+  getTotalNotes: notesController.getTotalNotes,
+  deleteNotes: notesController.deleteNotes,
+  insertNotes: notesController.insertNotes,
   // moveFile: fileController.moveFile,
   //获取日记diary（分页查询）（模糊查询那些后面在做）
   getDiary: (req, res, next) => {
