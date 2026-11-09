@@ -36,11 +36,11 @@
 
 const token =
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjExMTExMTExLTExMTEtMTExMS0xMTExLTExMTExMTExMTExMSIsIm5hbWUiOiLljZrkuLtBIiwiaWF0IjoxNzkzNjIzMjg2LCJleHAiOjE3OTQyMjgwODZ9.-nRVzTzbeNGi6tI83lz39TYLiS7y7f64hYeeriIDiGg'
-fetch('http://localhost:3001/notes/getNotes', {
+fetch('http://api.xiaolinlin.xyz/notes/getNotes', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
-    Authorization: `Bearer ${token}`,
+    // Authorization: `Bearer ${token}`,
   },
   body: JSON.stringify({}),
 })
