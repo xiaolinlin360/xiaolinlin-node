@@ -1,8 +1,7 @@
 import serve from '../controller/serve.js'
 import { auth } from '../lib/auth.js'
-import multer from 'multer'
-// 创建 upload 实例（最简单的内存存储写法）
-const upload = multer({ dest: 'uploads/' })
+// 上传配置在 config/data.js 里统一维护（存储目录、文件名清洗、大小限制）
+import { upload } from '../config/data.js'
 
 //req 请求对象，res 响应对象，next 中间件函数
 export const hi = (app) => {
@@ -83,6 +82,27 @@ export const getArticle = (app) => {
 export const getTotalArticle = (app) => {
   app.post('/article/getTotalArticle', auth, (req, res) => {
     serve.getTotalArticle(req, res)
+  })
+}
+
+//获取文章详情（编辑回显）
+export const getArticleDetail = (app) => {
+  app.post('/article/getArticleDetail', auth, (req, res) => {
+    serve.getArticleDetail(req, res)
+  })
+}
+
+//新建文章
+export const insertArticle = (app) => {
+  app.post('/article/insertArticle', auth, (req, res) => {
+    serve.insertArticle(req, res)
+  })
+}
+
+//编辑文章
+export const updateArticle = (app) => {
+  app.post('/article/updateArticle', auth, (req, res) => {
+    serve.updateArticle(req, res)
   })
 }
 
@@ -178,9 +198,24 @@ export const getTotalFile = (app) => {
 
 //上传文件
 export const uploadFile = (app) => {
-  app.post('/files/uploadFile', auth, upload.single('file'), (req, res) => {
-    serve.uploadFile(req, res)
-  })
+  app.post(
+    '/files/uploadFile',
+    auth,
+    // 单独包一层，把 multer 的异常转成 JSON（否则会走默认错误页，前端拿到 HTML）
+    (req, res, next) => {
+      upload.single('file')(req, res, (err) => {
+        if (err) {
+          const message =
+            err.code === 'LIMIT_FILE_SIZE' ? '文件超过 50MB 限制' : `文件上传失败：${err.message}`
+          return res.status(400).json({ code: 400, message, data: null })
+        }
+        next()
+      })
+    },
+    (req, res) => {
+      serve.uploadFile(req, res)
+    }
+  )
 }
 
 //移动文件到不同的分类（修改subset id）

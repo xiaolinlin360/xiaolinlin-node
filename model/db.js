@@ -53,11 +53,11 @@ const dbTables = {
         id UUID PRIMARY KEY DEFAULT gen_random_uuid (),
         title TEXT NOT NULL,
         content TEXT NOT NULL, --存储md格式的内容
-        subset_id UUID NOT NULL, -- 子集id
+        subset_id UUID, -- 子集id（可空：随笔可以不属于任何分组）
         created_at TIMESTAMP DEFAULT NOW(),
         CONSTRAINT fk_notes_subset_id_to_subsets_id 
           FOREIGN KEY (subset_id) REFERENCES subsets (id) 
-          ON DELETE CASCADE                -- 按需：CASCADE / RESTRICT / SET NULL
+          ON DELETE SET NULL               -- 分组被删时随笔保留，只脱离分组
     );
 `,
   // ② files 表增加 gallery_id 并补外键

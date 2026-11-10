@@ -1,4 +1,7 @@
 import pool from '../model/db.js'
+import fs from 'node:fs'
+import path from 'node:path'
+import { DATA_DIR } from '../config/data.js'
 import loginController from './login/login.js'
 import commentController from './comment/comment.js'
 import messageController from './message/message.js'
@@ -26,6 +29,9 @@ const serve = {
   //文章
   getArticle: articleController.getArticle,
   getTotalArticle: articleController.getTotalArticle,
+  getArticleDetail: articleController.getArticleDetail,
+  insertArticle: articleController.insertArticle,
+  updateArticle: articleController.updateArticle,
   updateArticleStatus: articleController.updateArticleStatus,
   deleteArticle: articleController.deleteArticle,
   //子集
@@ -52,6 +58,45 @@ const serve = {
   getTotalNotes: notesController.getTotalNotes,
   deleteNotes: notesController.deleteNotes,
   insertNotes: notesController.insertNotes,
+
+  //上传文件（笔记/文章内嵌图片、文章封面等）
+  uploadFile: async (req, res) => {
+    if (!req.file) {
+      return res.status(400).json({ code: 400, message: '没有收到文件', data: null })
+    }
+
+    // 文件已由 config/data.js 的 diskStorage 落到 data/<fileId>/<filename>
+    const { fileId, file } = req
+    const url = `/data/${fileId}/${encodeURIComponent(file.filename)}`
+
+    // 落库：articles.cover_file_id 是指向 files(id) 的外键，
+    // 没有这条记录就无法作为封面引用；顺带也让文件出现在「本地文件」页。
+    try {
+      await pool.query(
+        `INSERT INTO files (id, user_id, file_name, type, size, url)
+         VALUES ($1, $2, $3, $4, $5, $6);`,
+        [fileId, req.user.id, file.filename, file.mimetype, String(file.size), url]
+      )
+    } catch (err) {
+      console.error('[uploadFile] 入库失败:', err)
+      // 入库失败就把刚落盘的文件删掉，避免留下没有记录的孤儿文件
+      fs.rmSync(path.join(DATA_DIR, fileId), { recursive: true, force: true })
+      return res.status(500).json({ code: 500, message: '文件入库失败', data: null })
+    }
+
+    return res.status(200).json({
+      code: 200,
+      message: '上传成功',
+      data: {
+        id: fileId, // 给文章的 cover_file_id 用
+        url,
+        file_name: file.filename,
+        size: file.size,
+        type: file.mimetype,
+      },
+    })
+  },
+
   // moveFile: fileController.moveFile,
   //获取日记diary（分页查询）（模糊查询那些后面在做）
   getDiary: (req, res, next) => {
