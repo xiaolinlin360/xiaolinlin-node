@@ -74,6 +74,7 @@ const dbTables = {
         created_at TIMESTAMP DEFAULT NOW(),
         CONSTRAINT fk_files_user_id_to_users_id     FOREIGN KEY (user_id)    REFERENCES users (id),
         CONSTRAINT fk_files_gallery_id_to_gallerys_id FOREIGN KEY (gallery_id) REFERENCES gallerys (id)
+            ON UPDATE CASCADE ON DELETE SET NULL   -- 删图库时照片保留，只是脱离图库
     );
 `,
   articles: `

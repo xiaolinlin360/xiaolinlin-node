@@ -51,6 +51,9 @@ const serve = {
   //画廊
   getGallery: galleryController.getGallery,
   getTotalGallery: galleryController.getTotalGallery,
+  getGalleryDetail: galleryController.getGalleryDetail,
+  insertGallery: galleryController.insertGallery,
+  updateGallery: galleryController.updateGallery,
   deleteGallery: galleryController.deleteGallery,
   //笔记
   getNotes: notesController.getNotes,

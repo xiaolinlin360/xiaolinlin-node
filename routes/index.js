@@ -237,6 +237,24 @@ export const getTotalGallery = (app) => {
     serve.getTotalGallery(req, res)
   })
 }
+//获取图库详情（编辑回显）
+export const getGalleryDetail = (app) => {
+  app.post('/gallerys/getGalleryDetail', auth, (req, res) => {
+    serve.getGalleryDetail(req, res)
+  })
+}
+//新建图库
+export const insertGallery = (app) => {
+  app.post('/gallerys/insertGallery', auth, (req, res) => {
+    serve.insertGallery(req, res)
+  })
+}
+//编辑图库
+export const updateGallery = (app) => {
+  app.post('/gallerys/updateGallery', auth, (req, res) => {
+    serve.updateGallery(req, res)
+  })
+}
 //删除画廊
 export const deleteGallery = (app) => {
   app.post('/gallerys/deleteGallery', auth, (req, res) => {
