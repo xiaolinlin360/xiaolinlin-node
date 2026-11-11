@@ -196,6 +196,13 @@ export const getTotalFile = (app) => {
   })
 }
 
+//获取 data 目录占用（总览页「本地文件」卡片）
+export const getStorageSize = (app) => {
+  app.post('/files/getStorageSize', auth, (req, res) => {
+    serve.getStorageSize(req, res)
+  })
+}
+
 //上传文件
 export const uploadFile = (app) => {
   app.post(

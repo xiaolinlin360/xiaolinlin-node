@@ -1,5 +1,51 @@
 import pool from '../../model/db.js'
 import crypto from 'node:crypto' // 引入 crypto 兜底
+import fs from 'node:fs/promises'
+import path from 'node:path'
+import { DATA_DIR } from '../../config/data.js'
+
+/** 递归统计目录的占用大小与文件个数 */
+const calcDirSize = async (dir) => {
+  let bytes = 0
+  let count = 0
+
+  // 目录不存在 / 无权限时按空处理，避免整个接口 500
+  const entries = await fs.readdir(dir, { withFileTypes: true }).catch(() => [])
+
+  for (const entry of entries) {
+    const full = path.join(dir, entry.name)
+    if (entry.isDirectory()) {
+      const sub = await calcDirSize(full)
+      bytes += sub.bytes
+      count += sub.count
+    } else if (entry.isFile()) {
+      const stat = await fs.stat(full).catch(() => null)
+      if (stat) {
+        bytes += stat.size
+        count += 1
+      }
+    }
+  }
+
+  return { bytes, count }
+}
+
+/** 字节数转可读文案：434.36 MB */
+const formatSize = (bytes) => {
+  if (!bytes) return '0 B'
+  const units = ['B', 'KB', 'MB', 'GB', 'TB']
+  let value = bytes
+  let index = 0
+  while (value >= 1024 && index < units.length - 1) {
+    value /= 1024
+    index += 1
+  }
+  return `${value.toFixed(index === 0 ? 0 : 2)} ${units[index]}`
+}
+
+// data 目录可能很大，不做缓存的话每打开一次总览都要全盘遍历一遍
+const SIZE_CACHE_TTL = 30 * 1000
+let sizeCache = { at: 0, bytes: 0, count: 0 }
 
 const fileController = {
   //获取文件（分页查询）
@@ -122,6 +168,29 @@ const fileController = {
     } catch (err) {
       console.error('文件上传入库失败:', err)
       res.status(500).json({ data: { message: '数据库插入错误' }, code: 500 })
+    }
+  },
+  // 获取 data 目录占用（总览页「本地文件」卡片用）
+  getStorageSize: async (req, res) => {
+    try {
+      const now = Date.now()
+      if (now - sizeCache.at > SIZE_CACHE_TTL) {
+        const { bytes, count } = await calcDirSize(DATA_DIR)
+        sizeCache = { at: now, bytes, count }
+      }
+
+      res.status(200).json({
+        code: 200,
+        message: 'ok',
+        data: {
+          bytes: sizeCache.bytes,
+          count: sizeCache.count,
+          text: formatSize(sizeCache.bytes),
+        },
+      })
+    } catch (err) {
+      console.error('[getStorageSize]', err)
+      res.status(500).json({ code: 500, message: '目录统计失败', data: null })
     }
   },
   //文件删除和修改后面在做吧

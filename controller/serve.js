@@ -48,6 +48,7 @@ const serve = {
   //文件
   getFile: fileController.getFile,
   getTotalFile: fileController.getTotalFile,
+  getStorageSize: fileController.getStorageSize,
   //画廊
   getGallery: galleryController.getGallery,
   getTotalGallery: galleryController.getTotalGallery,

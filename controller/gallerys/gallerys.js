@@ -135,9 +135,7 @@ const galleryController = {
     if (errMsg) return res.status(400).json({ code: 400, message: errMsg, data: null })
 
     const { title, subset_id } = req.body
-    const photo_ids = Array.isArray(req.body.photo_ids)
-      ? req.body.photo_ids.filter(Boolean)
-      : []
+    const photo_ids = Array.isArray(req.body.photo_ids) ? req.body.photo_ids.filter(Boolean) : []
 
     const client = await pool.connect()
     try {
@@ -177,9 +175,7 @@ const galleryController = {
     if (errMsg) return res.status(400).json({ code: 400, message: errMsg, data: null })
 
     const { title, subset_id } = req.body
-    const photo_ids = Array.isArray(req.body.photo_ids)
-      ? req.body.photo_ids.filter(Boolean)
-      : []
+    const photo_ids = Array.isArray(req.body.photo_ids) ? req.body.photo_ids.filter(Boolean) : []
 
     const client = await pool.connect()
     try {
@@ -222,7 +218,9 @@ const galleryController = {
       if (err) {
         console.error('[deleteGallery]', err)
         if (err.code === '23503') {
-          return res.status(400).json({ code: 400, message: '该图库下还有照片，不能删除', data: null })
+          return res
+            .status(400)
+            .json({ code: 400, message: '该图库下还有照片，不能删除', data: null })
         }
         return res.status(500).json({ code: 500, message: '数据库删除错误', data: null })
       }
