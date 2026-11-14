@@ -29,24 +29,31 @@ export const login = (app) => {
   })
 }
 
-//获取评论
-export const getComment = (app) => {
-  app.post('/comments/getComment', auth, (req, res) => {
-    serve.getComment(req, res)
+//获取留言（公开：访客也要能看）
+export const getGuestbook = (app) => {
+  app.post('/guestbooks/getGuestbook', (req, res) => {
+    serve.getGuestbook(req, res)
   })
 }
 
-//获取评论总数，总页码让前端自己算
-export const getTotalComment = (app) => {
-  app.post('/comments/getTotalComment', auth, (req, res) => {
-    serve.getTotalComment(req, res)
+//获取留言总数（公开）
+export const getTotalGuestbook = (app) => {
+  app.post('/guestbooks/getTotalGuestbook', (req, res) => {
+    serve.getTotalGuestbook(req, res)
   })
 }
 
-//删除评论
-export const deleteComment = (app) => {
-  app.post('/comments/deleteComment', auth, (req, res) => {
-    serve.deleteComment(req, res)
+//发表留言（公开：匿名留言不需要登录）
+export const insertGuestbook = (app) => {
+  app.post('/guestbooks/insertGuestbook', (req, res) => {
+    serve.insertGuestbook(req, res)
+  })
+}
+
+//删除留言（需要登录，只有博客主人能删）
+export const deleteGuestbook = (app) => {
+  app.post('/guestbooks/deleteGuestbook', auth, (req, res) => {
+    serve.deleteGuestbook(req, res)
   })
 }
 

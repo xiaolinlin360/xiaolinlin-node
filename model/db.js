@@ -125,19 +125,13 @@ const dbTables = {
     );
   `,
 
-  comments: `
-    CREATE TABLE IF NOT EXISTS comments (
+  // 全站留言板：匿名，只要「称呼 + 内容」，不关联用户也不关联文章
+  guestbooks: `
+    CREATE TABLE IF NOT EXISTS guestbooks (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid (),
-        user_id UUID NOT NULL,
-        article_id UUID NOT NULL,
-        parent_id UUID,
-        reply_to_user_id UUID, -- 回复的用户id
-        content TEXT NOT NULL,
-        created_at TIMESTAMP DEFAULT NOW(),
-        CONSTRAINT fk_comments_user_id_to_users_id FOREIGN KEY (user_id) REFERENCES users (id),
-        CONSTRAINT fk_comments_article_id_to_articles_id FOREIGN KEY (article_id) REFERENCES articles (id) ON DELETE CASCADE, 
-        CONSTRAINT fk_comments_reply_to_user_id_to_users_id FOREIGN KEY (reply_to_user_id) REFERENCES users (id),
-        CONSTRAINT fk_comments_parent_id_to_comments_id FOREIGN KEY (parent_id) REFERENCES comments (id) on delete cascade
+        nickname VARCHAR(30) NOT NULL,  -- 称呼
+        content VARCHAR(500) NOT NULL,  -- 留言内容
+        created_at TIMESTAMP DEFAULT NOW()
     );
   `,
 

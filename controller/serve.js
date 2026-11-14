@@ -3,7 +3,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { DATA_DIR } from '../config/data.js'
 import loginController from './login/login.js'
-import commentController from './comment/comment.js'
+import guestbookController from './guestbook/guestbook.js'
 import messageController from './message/message.js'
 import articleController from './article/article.js'
 import subsetController from './subset/subset.js'
@@ -18,10 +18,11 @@ const serve = {
   isRegistered: loginController.isRegistered,
   login: loginController.login,
   insertUser: loginController.insertUser,
-  //评论
-  getComment: commentController.getComment,
-  getTotalComment: commentController.getTotalComment,
-  deleteComment: commentController.deleteComment,
+  //留言板
+  getGuestbook: guestbookController.getGuestbook,
+  getTotalGuestbook: guestbookController.getTotalGuestbook,
+  insertGuestbook: guestbookController.insertGuestbook,
+  deleteGuestbook: guestbookController.deleteGuestbook,
   //消息
   getMessage: messageController.getMessage,
   getTotalMessage: messageController.getTotalMessage,
