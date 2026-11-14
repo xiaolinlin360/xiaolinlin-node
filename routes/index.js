@@ -1,7 +1,24 @@
 import serve from '../controller/serve.js'
 import { auth } from '../lib/auth.js'
+import { rateLimit } from '../lib/rateLimit.js'
 // 上传配置在 config/data.js 里统一维护（存储目录、文件名清洗、大小限制）
 import { upload } from '../config/data.js'
+
+// 登录防爆破：同一 IP 15 分钟内最多 10 次尝试
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  message: '登录尝试过于频繁，请 15 分钟后再试',
+  keyPrefix: 'login',
+})
+
+// 匿名留言防刷：同一 IP 每分钟最多 5 条
+const guestbookLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 5,
+  message: '留言太频繁了，请稍后再试',
+  keyPrefix: 'guestbook',
+})
 
 //req 请求对象，res 响应对象，next 中间件函数
 export const hi = (app) => {
@@ -22,9 +39,9 @@ export const insertUser = (app) => {
   })
 }
 
-//注册登录
+//注册登录（限流：防密码爆破）
 export const login = (app) => {
-  app.post('/user/login', (req, res) => {
+  app.post('/user/login', loginLimiter, (req, res) => {
     serve.login(req, res)
   })
 }
@@ -43,9 +60,9 @@ export const getTotalGuestbook = (app) => {
   })
 }
 
-//发表留言（公开：匿名留言不需要登录）
+//发表留言（公开：匿名留言不需要登录，所以必须限流防刷）
 export const insertGuestbook = (app) => {
-  app.post('/guestbooks/insertGuestbook', (req, res) => {
+  app.post('/guestbooks/insertGuestbook', guestbookLimiter, (req, res) => {
     serve.insertGuestbook(req, res)
   })
 }
