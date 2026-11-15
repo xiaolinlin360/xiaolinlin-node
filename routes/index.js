@@ -46,6 +46,20 @@ export const login = (app) => {
   })
 }
 
+//获取个人信息
+export const getProfile = (app) => {
+  app.post('/user/getProfile', auth, (req, res) => {
+    serve.getProfile(req, res)
+  })
+}
+
+//修改个人信息（名称、头像）
+export const updateProfile = (app) => {
+  app.post('/user/updateProfile', auth, (req, res) => {
+    serve.updateProfile(req, res)
+  })
+}
+
 //获取留言（公开：访客也要能看）
 export const getGuestbook = (app) => {
   app.post('/guestbooks/getGuestbook', (req, res) => {

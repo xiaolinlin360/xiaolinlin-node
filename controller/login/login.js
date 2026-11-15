@@ -56,6 +56,45 @@ const loginController = {
       ok(res, { token, user }, '登录成功')
     })
   },
+
+  //获取个人信息
+  getProfile: (req, res) => {
+    let _sql =
+      'SELECT id, name, email, phone, permission, imgurl, created_at FROM users WHERE id = $1;'
+
+    pool.query(_sql, [req.user.id], (err, result) => {
+      if (err) {
+        console.error('[getProfile]', err)
+        return fail(res, 500, '数据库查询错误')
+      }
+      if (result.rows.length === 0) return fail(res, 404, '用户不存在')
+      ok(res, result.rows[0])
+    })
+  },
+
+  //修改个人信息（目前只改名称和头像）
+  updateProfile: (req, res) => {
+    const name = (req.body.name || '').trim()
+    const imgurl = req.body.imgurl || ''
+
+    if (!name) return fail(res, 400, '名称不能为空')
+    if (name.length > 20) return fail(res, 400, '名称不能超过 20 个字')
+
+    let _sql = `
+      UPDATE users
+      SET name = $1, imgurl = $2
+      WHERE id = $3
+      RETURNING id, name, email, phone, permission, imgurl, created_at;
+    `
+
+    pool.query(_sql, [name, imgurl, req.user.id], (err, result) => {
+      if (err) {
+        console.error('[updateProfile]', err)
+        return fail(res, 500, '数据库更新错误')
+      }
+      ok(res, result.rows[0], '保存成功')
+    })
+  },
 }
 
 export default loginController

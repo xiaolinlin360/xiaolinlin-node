@@ -19,6 +19,8 @@ const serve = {
   isRegistered: loginController.isRegistered,
   login: loginController.login,
   insertUser: loginController.insertUser,
+  getProfile: loginController.getProfile,
+  updateProfile: loginController.updateProfile,
   //留言板
   getGuestbook: guestbookController.getGuestbook,
   getTotalGuestbook: guestbookController.getTotalGuestbook,
