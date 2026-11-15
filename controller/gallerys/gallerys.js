@@ -1,24 +1,6 @@
 import pool from '../../model/db.js'
-
-/** 图库表单校验，返回错误文案或 null */
-const validateGalleryBody = (body = {}) => {
-  const { title, subset_id } = body
-  if (!title || !String(title).trim()) return '图库名称不能为空'
-  if (String(title).length > 40) return '图库名称不能超过 40 个字符'
-  if (!subset_id) return '请选择分组'
-  return null
-}
-
-/** 把照片挂到图库上：先解绑这个图库原有的，再绑定新的（前端每次传全量列表） */
-const attachPhotos = async (client, galleryId, photoIds) => {
-  await client.query('UPDATE files SET gallery_id = NULL WHERE gallery_id = $1;', [galleryId])
-  if (photoIds.length > 0) {
-    await client.query('UPDATE files SET gallery_id = $1 WHERE id = ANY($2::uuid[]);', [
-      galleryId,
-      photoIds,
-    ])
-  }
-}
+import { validateGalleryBody } from './utils/validateGalleryBody.js'
+import { attachPhotos } from './utils/attachPhotos.js'
 
 const galleryController = {
   // 获取画廊列表

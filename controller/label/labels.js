@@ -1,17 +1,7 @@
 import pool from '../../model/db.js'
 import { ok, fail } from '../../lib/respond.js'
+import { buildLabelsQuery } from './utils/buildLabelsQuery.js'
 
-/** 根据 keyword 生成查询语句与参数（纯函数，便于单测） */
-const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
-function buildLabelsQuery(keyword = '') {
-  const kw = String(keyword).trim()
-  if (!kw) return { sql: 'SELECT * FROM labels ORDER BY id ASC', values: [] }
-  const byId = UUID_RE.test(kw)
-  return {
-    sql: `SELECT * FROM labels WHERE ${byId ? 'id = $1' : 'label_name ILIKE $1'} ORDER BY id ASC`,
-    values: [byId ? kw : `%${kw}%`],
-  }
-}
 const labelController = {
   //获取所有标签
   getLabels: async (req, res, next) => {

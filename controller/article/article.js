@@ -1,28 +1,7 @@
 import pool from '../../model/db.js'
 import { ok, fail } from '../../lib/respond.js'
-
-/** 新建 / 编辑共用的字段校验，返回错误文案或 null */
-const validateArticleBody = (body = {}) => {
-  const { title, introduce, content, subset_id } = body
-  if (!title || !String(title).trim()) return '标题不能为空'
-  if (String(title).length > 40) return '标题不能超过 40 个字符'
-  if (!introduce || !String(introduce).trim()) return '简介不能为空'
-  if (String(introduce).length > 400) return '简介不能超过 400 个字符'
-  if (!content || !String(content).trim()) return '正文不能为空'
-  if (!subset_id) return '请选择文章分组'
-  return null
-}
-
-/** 把附件挂到文章上：先解绑这篇文章原有的，再绑定新的（前端每次都传全量列表） */
-const attachFiles = async (client, articleId, attachmentIds) => {
-  await client.query('UPDATE files SET article_id = NULL WHERE article_id = $1;', [articleId])
-  if (attachmentIds.length > 0) {
-    await client.query('UPDATE files SET article_id = $1 WHERE id = ANY($2::uuid[]);', [
-      articleId,
-      attachmentIds,
-    ])
-  }
-}
+import { validateArticleBody } from './utils/validateArticleBody.js'
+import { attachFiles } from './utils/attachFiles.js'
 
 const articleController = {
   //获取文章
