@@ -2,6 +2,16 @@ import pool from '../../model/db.js'
 import { generateToken } from '../../lib/jwt.js'
 import { ok, fail } from '../../lib/respond.js'
 import { hashPassword, checkPassword } from '../../lib/password.js'
+import { createCode, verifyCode, removeCode, sendCode } from '../../lib/verifyCode.js'
+
+/** 把邮箱/手机打码后再返回给前端显示，如 ab***@blog.com / 861***8000 */
+const maskTarget = (target) => {
+  if (target.includes('@')) {
+    const [name, domain] = target.split('@')
+    return `${name.slice(0, 2)}***@${domain}`
+  }
+  return `${target.slice(0, 3)}***${target.slice(-4)}`
+}
 
 //查询是否注册
 const loginController = {
@@ -171,6 +181,88 @@ const loginController = {
       if (result.rowCount === 0) return fail(res, 404, '用户不存在')
       ok(res, result.rows[0], '权限已更新')
     })
+  },
+
+  //方式一：用原密码改密码
+  updatePassword: async (req, res) => {
+    const oldPassword = req.body.oldPassword || ''
+    const newPassword = req.body.newPassword || ''
+
+    if (!oldPassword) return fail(res, 400, '请输入原密码')
+    if (newPassword.length < 6) return fail(res, 400, '新密码至少 6 位')
+
+    try {
+      const result = await pool.query('SELECT password FROM users WHERE id = $1;', [req.user.id])
+      if (!(await checkPassword(result.rows[0], oldPassword))) {
+        return fail(res, 400, '原密码不正确')
+      }
+
+      const hash = await hashPassword(newPassword)
+      await pool.query('UPDATE users SET password = $1 WHERE id = $2;', [hash, req.user.id])
+      ok(res, null, '密码已修改')
+    } catch (err) {
+      console.error('[updatePassword]', err)
+      fail(res, 500, '数据库更新错误')
+    }
+  },
+
+  //方式二/三：先发验证码（发到当前登录用户自己的邮箱或手机）
+  sendCode: async (req, res) => {
+    const channel = req.body.channel
+    if (channel !== 'email' && channel !== 'phone') {
+      return fail(res, 400, 'channel 只能是 email 或 phone')
+    }
+
+    try {
+      const result = await pool.query('SELECT email, phone FROM users WHERE id = $1;', [
+        req.user.id,
+      ])
+      const user = result.rows[0]
+      const target = channel === 'email' ? user.email : user.phone
+
+      if (!target) return fail(res, 400, channel === 'email' ? '你还没绑定邮箱' : '你还没绑定手机号')
+
+      const code = createCode(req.user.id, channel)
+      await sendCode(channel, target, code)
+
+      // 本地调试用：NODE_ENV 不是 production 时把验证码一起返回，
+      // 这样不接第三方也能在浏览器里走通。接好邮件/短信后删掉 code 字段即可。
+      const isDev = process.env.NODE_ENV !== 'production'
+      ok(
+        res,
+        isDev ? { target: maskTarget(target), code } : { target: maskTarget(target) },
+        '验证码已发送'
+      )
+    } catch (err) {
+      console.error('[sendCode]', err)
+      fail(res, 500, '验证码发送失败')
+    }
+  },
+
+  //方式二/三：用验证码重置密码
+  resetPasswordByCode: async (req, res) => {
+    const { channel, code } = req.body
+    const newPassword = req.body.newPassword || ''
+
+    if (channel !== 'email' && channel !== 'phone') {
+      return fail(res, 400, 'channel 只能是 email 或 phone')
+    }
+    if (!code) return fail(res, 400, '请输入验证码')
+    if (newPassword.length < 6) return fail(res, 400, '新密码至少 6 位')
+
+    if (!verifyCode(req.user.id, channel, code)) {
+      return fail(res, 400, '验证码不正确或已过期')
+    }
+
+    try {
+      const hash = await hashPassword(newPassword)
+      await pool.query('UPDATE users SET password = $1 WHERE id = $2;', [hash, req.user.id])
+      removeCode(req.user.id, channel) // 用完即作废
+      ok(res, null, '密码已重置')
+    } catch (err) {
+      console.error('[resetPasswordByCode]', err)
+      fail(res, 500, '数据库更新错误')
+    }
   },
 }
 

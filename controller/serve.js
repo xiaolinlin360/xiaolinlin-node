@@ -24,6 +24,9 @@ const serve = {
   getUsers: loginController.getUsers,
   addUser: loginController.addUser,
   updatePermission: loginController.updatePermission,
+  updatePassword: loginController.updatePassword,
+  sendCode: loginController.sendCode,
+  resetPasswordByCode: loginController.resetPasswordByCode,
   //留言板
   getGuestbook: guestbookController.getGuestbook,
   getTotalGuestbook: guestbookController.getTotalGuestbook,

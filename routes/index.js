@@ -81,6 +81,27 @@ export const updatePermission = (app) => {
   })
 }
 
+//改密码（方式一：原密码）
+export const updatePassword = (app) => {
+  app.post('/user/updatePassword', auth, (req, res) => {
+    serve.updatePassword(req, res)
+  })
+}
+
+//发验证码（方式二/三：邮箱、手机）
+export const sendCode = (app) => {
+  app.post('/user/sendCode', auth, (req, res) => {
+    serve.sendCode(req, res)
+  })
+}
+
+//用验证码重置密码（方式二/三）
+export const resetPasswordByCode = (app) => {
+  app.post('/user/resetPasswordByCode', auth, (req, res) => {
+    serve.resetPasswordByCode(req, res)
+  })
+}
+
 //获取留言（公开：访客也要能看）
 export const getGuestbook = (app) => {
   app.post('/guestbooks/getGuestbook', (req, res) => {
