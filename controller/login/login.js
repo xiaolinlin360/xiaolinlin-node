@@ -1,6 +1,7 @@
 import pool from '../../model/db.js'
 import { generateToken } from '../../lib/jwt.js'
 import { ok, fail } from '../../lib/respond.js'
+import { hashPassword, checkPassword } from '../../lib/password.js'
 
 //查询是否注册
 const loginController = {
@@ -36,27 +37,33 @@ const loginController = {
     })
   },
   //登录
-  login: (req, res, next) => {
-    const data = req.body
-    let _sql =
-      'SELECT id, name, email, phone, permission, imgurl, created_at FROM users WHERE name = $1 AND password = $2;'
-    pool.query(_sql, [data.name, data.password], (err, result) => {
-      if (err) {
-        console.error('[login]', err)
-        return fail(res, 500, '数据库查询错误')
-      }
+  login: async (req, res, next) => {
+    const { name, password } = req.body
+    if (!name || !password) return fail(res, 400, '用户名和密码不能为空')
+    // 注意：不在 SQL 里比对密码，因为库里存的是哈希，取出来在 JS 里比
+    let _sql = `
+    SELECT id, name, email, phone, permission, imgurl, created_at, password
+    FROM users WHERE name = $1;
+  `
+    try {
+      const result = await pool.query(_sql, [name])
       if (result.rows.length === 0) {
         // 401：账号或密码不对。前端据此区分"登录失败"与"会话过期"
         return fail(res, 401, '账号或密码不正确')
       }
-
       const user = result.rows[0]
+      if (!(await checkPassword(user, password))) {
+        return fail(res, 401, '账号或密码不正确')
+      }
+      delete user.password
       const token = generateToken(user.id, user.name, user.permission)
       // token 放进 data，信封保持三件套，不再往顶层挂字段
       ok(res, { token, user }, '登录成功')
-    })
+    } catch (err) {
+      console.error('[login]', err)
+      fail(res, 500, '数据库查询错误')
+    }
   },
-
   //获取个人信息
   getProfile: (req, res) => {
     let _sql =
@@ -112,7 +119,7 @@ const loginController = {
   },
 
   //添加用户（仅 0 级能调）
-  addUser: (req, res) => {
+  addUser: async (req, res) => {
     const name = (req.body.name || '').trim()
     const email = (req.body.email || '').trim()
     const password = req.body.password || ''
@@ -124,20 +131,23 @@ const loginController = {
     if (!email) return fail(res, 400, '邮箱不能为空')
     if (!password) return fail(res, 400, '密码不能为空')
 
+    // 存进库的是 argon2id 哈希（自带盐），不是明文
+    const hash = await hashPassword(password)
+
     let _sql = `
       INSERT INTO users (name, email, phone, password, permission)
       VALUES ($1, $2, $3, $4, $5)
       RETURNING id, name, email, phone, permission, created_at;
     `
 
-    pool.query(_sql, [name, email, phone, password, permission], (err, result) => {
-      if (err) {
-        console.error('[addUser]', err)
-        if (err.code === '23505') return fail(res, 409, '名称、邮箱或手机号已被使用')
-        return fail(res, 500, '数据库插入错误')
-      }
+    try {
+      const result = await pool.query(_sql, [name, email, phone, hash, permission])
       ok(res, result.rows[0], '添加成功')
-    })
+    } catch (err) {
+      console.error('[addUser]', err)
+      if (err.code === '23505') return fail(res, 409, '名称、邮箱或手机号已被使用')
+      fail(res, 500, '数据库插入错误')
+    }
   },
 
   //修改某个用户的权限（仅 0 级能调，且不能改自己）
