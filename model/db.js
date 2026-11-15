@@ -10,8 +10,10 @@ const dbTables = {
         id UUID PRIMARY KEY DEFAULT gen_random_uuid (),
         name TEXT NOT NULL,
         email TEXT UNIQUE,
+        phone VARCHAR(20) UNIQUE, -- 手机号，带国家码，如 8613800138000
         password TEXT NOT NULL,
         imgurl VARCHAR(255) DEFAULT '', -- 头像路径
+        permission SMALLINT NOT NULL DEFAULT 1, -- 权限等级：数字越小权限越大，0 为最高
         is_deleted bool NOT NULL DEFAULT FALSE, -- 是否删除(默认未删除false)
         created_at TIMESTAMP DEFAULT NOW()
     );

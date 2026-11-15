@@ -38,7 +38,8 @@ const loginController = {
   //登录
   login: (req, res, next) => {
     const data = req.body
-    let _sql = 'SELECT id, name, email, created_at FROM users WHERE name = $1 AND password = $2;'
+    let _sql =
+      'SELECT id, name, email, phone, permission, imgurl, created_at FROM users WHERE name = $1 AND password = $2;'
     pool.query(_sql, [data.name, data.password], (err, result) => {
       if (err) {
         console.error('[login]', err)
@@ -50,7 +51,7 @@ const loginController = {
       }
 
       const user = result.rows[0]
-      const token = generateToken(user.id, user.name)
+      const token = generateToken(user.id, user.name, user.permission)
       // token 放进 data，信封保持三件套，不再往顶层挂字段
       ok(res, { token, user }, '登录成功')
     })
