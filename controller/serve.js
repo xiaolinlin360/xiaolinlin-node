@@ -2,6 +2,7 @@ import pool from '../model/db.js'
 import fs from 'node:fs'
 import path from 'node:path'
 import { DATA_DIR } from '../config/data.js'
+import { ok, fail } from '../lib/respond.js'
 import loginController from './login/login.js'
 import guestbookController from './guestbook/guestbook.js'
 import messageController from './message/message.js'
@@ -67,7 +68,7 @@ const serve = {
   //上传文件（笔记/文章内嵌图片、文章封面等）
   uploadFile: async (req, res) => {
     if (!req.file) {
-      return res.status(400).json({ code: 400, message: '没有收到文件', data: null })
+      return fail(res, 400, '没有收到文件')
     }
 
     // 文件已由 config/data.js 的 diskStorage 落到 data/<fileId>/<filename>
@@ -86,70 +87,25 @@ const serve = {
       console.error('[uploadFile] 入库失败:', err)
       // 入库失败就把刚落盘的文件删掉，避免留下没有记录的孤儿文件
       fs.rmSync(path.join(DATA_DIR, fileId), { recursive: true, force: true })
-      return res.status(500).json({ code: 500, message: '文件入库失败', data: null })
+      return fail(res, 500, '文件入库失败')
     }
 
-    return res.status(200).json({
-      code: 200,
-      message: '上传成功',
-      data: {
+    ok(
+      res,
+      {
         id: fileId, // 给文章的 cover_file_id 用
         url,
         file_name: file.filename,
         size: file.size,
         type: file.mimetype,
       },
-    })
+      '上传成功'
+    )
   },
 
-  // moveFile: fileController.moveFile,
-  //获取日记diary（分页查询）（模糊查询那些后面在做）
-  getDiary: (req, res, next) => {
-    const pageSize = req.body.pageSize || 10
-    const pageNum = req.body.pageNum || 0
-    const user = req.user.id
-    let _sql = 'SELECT * FROM diary WHERE user_id = $1 ORDER BY id DESC LIMIT $2 OFFSET $3;'
-    pool.query(_sql, [user, pageSize, (pageNum - 1) * pageSize], (err, result) => {
-      if (err) {
-        console.error(err)
-        res.status(500).json({ data: { message: '数据库查询错误' }, code: 500 })
-      } else {
-        res.status(200).json({ data: result.rows, code: 200 })
-      }
-    })
-  },
-  //获取日记总数
-  getTotalDiary: (req, res, next) => {
-    let _sql = 'SELECT COUNT(*) FROM diary;'
-    pool.query(_sql, (err, result) => {
-      if (err) {
-        console.error(err)
-        res.status(500).json({ data: { message: '数据库查询错误' }, code: 500 })
-      } else {
-        res.status(200).json({ data: result.rows[0].count, code: 200 })
-      }
-    })
-  },
-  //新建日记
-  insertDiary: (req, res, next) => {
-    const data = req.body
-    const user = req.user.id
-    let _sql = 'INSERT INTO diary (user_id, title, content) VALUES ($1, $2, $3);'
-    pool.query(_sql, [user, data.title, data.content], (err, result) => {
-      if (err) {
-        console.error(err)
-        res.status(500).json({ data: { message: '数据库插入错误' }, code: 500 })
-      } else {
-        if (result.rowCount > 0) {
-          res.status(200).json({ data: { message: '日记新建成功' }, code: 200 })
-        } else {
-          res.status(404).json({ data: { message: '日记不存在或已被新建' }, code: 404 })
-        }
-      }
-    })
-  },
-  v3pz: (req, res, next) => {
-    res.status(200).json({ data: { message: 'v3pz' }, code: 200 })
+  // 冒烟用的探针接口，确认服务活着
+  v3pz: (req, res) => {
+    ok(res, null, 'v3pz')
   },
 }
 export default serve

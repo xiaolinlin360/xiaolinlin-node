@@ -34,18 +34,18 @@
 
 // 用张三的号去登录
 
-const token =
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjExMTExMTExLTExMTEtMTExMS0xMTExLTExMTExMTExMTExMSIsIm5hbWUiOiLljZrkuLtBIiwiaWF0IjoxNzkzNjIzMjg2LCJleHAiOjE3OTQyMjgwODZ9.-nRVzTzbeNGi6tI83lz39TYLiS7y7f64hYeeriIDiGg'
-fetch('http://api.xiaolinlin.xyz/notes/getNotes', {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json',
-    // Authorization: `Bearer ${token}`,
-  },
-  body: JSON.stringify({}),
-})
-  .then((res) => res.json())
-  .then((json) => console.dir(json, { depth: null }))
+// const token =
+//   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjExMTExMTExLTExMTEtMTExMS0xMTExLTExMTExMTExMTExMSIsIm5hbWUiOiLljZrkuLtBIiwiaWF0IjoxNzkzNjIzMjg2LCJleHAiOjE3OTQyMjgwODZ9.-nRVzTzbeNGi6tI83lz39TYLiS7y7f64hYeeriIDiGg'
+// fetch('http://api.xiaolinlin.xyz/notes/getNotes', {
+//   method: 'POST',
+//   headers: {
+//     'Content-Type': 'application/json',
+//     // Authorization: `Bearer ${token}`,
+//   },
+//   body: JSON.stringify({}),
+// })
+//   .then((res) => res.json())
+//   .then((json) => console.dir(json, { depth: null }))
 
 // 用张三的号，去获取评论
 // const token =
@@ -89,3 +89,16 @@ fetch('http://api.xiaolinlin.xyz/notes/getNotes', {
 //   },
 //   摄影: {},
 // }
+
+// fetch.js// fetch.js
+// fetch.js
+fetch('http://supabase.zegai.cn:8000/auth/v1/token?grant_type=password', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    apikey: 'sb_publishable_jC8wWSAXnlNVIJrbYTgO_2_aZH_mQzB', // ← jC8wW ... Xnl
+  },
+  body: JSON.stringify({ phone: '13826649402', password: 'a1234567' }),
+})
+  .then((res) => res.json())
+  .then((json) => console.log(json))

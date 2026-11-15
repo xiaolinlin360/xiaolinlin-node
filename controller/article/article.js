@@ -1,4 +1,5 @@
 import pool from '../../model/db.js'
+import { ok, fail } from '../../lib/respond.js'
 
 /** 新建 / 编辑共用的字段校验，返回错误文案或 null */
 const validateArticleBody = (body = {}) => {
@@ -85,16 +86,10 @@ const articleController = {
 
     pool.query(sql, params, (err, result) => {
       if (err) {
-        console.error('SQL Error:', err)
-        return res.status(500).json({
-          data: { message: '数据库查询错误' },
-          code: 500,
-        })
+        console.error('[getArticle] SQL Error:', err)
+        return fail(res, 500, '数据库查询错误')
       }
-      res.status(200).json({
-        data: { articles: result.rows, pageSize, pageNum },
-        code: 200,
-      })
+      ok(res, { articles: result.rows, pageSize, pageNum })
     })
   },
   //获取文章总数
@@ -104,8 +99,11 @@ const articleController = {
       ? 'SELECT COUNT(*)::int AS total FROM articles WHERE subset_id = $1;'
       : 'SELECT COUNT(*)::int AS total FROM articles;'
     pool.query(_sql, subset_id ? [subset_id] : [], (err, result) => {
-      if (err) return res.status(500).json({ data: { message: '数据库查询错误' }, code: 500 })
-      res.status(200).json({ data: { total: result.rows[0].total }, code: 200 })
+      if (err) {
+        console.error('[getTotalArticle]', err)
+        return fail(res, 500, '数据库查询错误')
+      }
+      ok(res, { total: result.rows[0].total })
     })
   },
   //修改文章的发布状态
@@ -114,19 +112,19 @@ const articleController = {
     const user = req.user.id // 当前登录用户id
     // 文章状态state=true=已发布，false=草稿
     if (data.state === undefined) {
-      return res.status(400).json({ code: 400, message: '发布状态参数错误', data: null })
+      return fail(res, 400, '发布状态参数错误')
     }
     let _sql = 'UPDATE articles SET state = $1 WHERE id = $2 AND user_id = $3;'
     pool.query(_sql, [data.state, data.id, user], (err, result) => {
       if (err) {
-        console.error(err)
-        res.status(500).json({ data: { message: '数据库更新错误' }, code: 500 })
+        console.error('[updateArticleStatus]', err)
+        return fail(res, 500, '数据库更新错误')
+      }
+      if (result.rowCount > 0) {
+        ok(res, null, '文章发布状态更新成功')
       } else {
-        if (result.rowCount > 0) {
-          res.status(200).json({ data: { message: '文章发布状态更新成功' }, code: 200 })
-        } else {
-          res.status(400).json({ data: { message: '文章不存在或已被更新' }, code: 400 })
-        }
+        // 找不到 = 文章不存在，或者不属于当前登录用户
+        fail(res, 404, '文章不存在或不属于当前用户')
       }
     })
   },
@@ -145,14 +143,13 @@ const articleController = {
     `
     pool.query(_sql, [data.id, user], (err, result) => {
       if (err) {
-        console.error(err)
-        res.status(500).json({ data: { message: '数据库删除错误' }, code: 500 })
+        console.error('[deleteArticle]', err)
+        return fail(res, 500, '数据库删除错误')
+      }
+      if (result.rowCount > 0) {
+        ok(res, null, '文章删除成功')
       } else {
-        if (result.rowCount > 0) {
-          res.status(200).json({ data: { message: '文章删除成功' }, code: 200 })
-        } else {
-          res.status(404).json({ data: { message: '文章不存在或已被删除' }, code: 404 })
-        }
+        fail(res, 404, '文章不存在或不属于当前用户')
       }
     })
   },
@@ -160,7 +157,7 @@ const articleController = {
   //获取文章详情（编辑回显用）
   getArticleDetail: (req, res) => {
     const { id } = req.body
-    if (!id) return res.status(400).json({ code: 400, message: '文章 id 不能为空', data: null })
+    if (!id) return fail(res, 400, '文章 id 不能为空')
 
     const _sql = `
       SELECT
@@ -207,19 +204,23 @@ const articleController = {
     pool.query(_sql, [id], (err, result) => {
       if (err) {
         console.error('[getArticleDetail]', err)
-        return res.status(500).json({ code: 500, message: '数据库查询错误', data: null })
+        // 22P02 = 传了个不是 UUID 的 id
+        if (err.code === '22P02') {
+          return fail(res, 400, '文章 id 格式不正确')
+        }
+        return fail(res, 500, '数据库查询错误')
       }
       if (result.rows.length === 0) {
-        return res.status(404).json({ code: 404, message: '文章不存在', data: null })
+        return fail(res, 404, '文章不存在')
       }
-      res.status(200).json({ code: 200, message: 'ok', data: result.rows[0] })
+      ok(res, result.rows[0])
     })
   },
 
   //新建文章（正文+封面+附件 id 一次性提交，附件在本事务里挂上去）
   insertArticle: async (req, res) => {
     const errMsg = validateArticleBody(req.body)
-    if (errMsg) return res.status(400).json({ code: 400, message: errMsg, data: null })
+    if (errMsg) return fail(res, 400, errMsg)
 
     const { title, introduce, content, subset_id } = req.body
     const state = req.body.state === true
@@ -243,17 +244,17 @@ const articleController = {
       await attachFiles(client, articleId, attachment_ids)
       await client.query('COMMIT')
 
-      res.status(200).json({ code: 200, message: '文章创建成功', data: { id: articleId } })
+      ok(res, { id: articleId }, '文章创建成功')
     } catch (err) {
       await client.query('ROLLBACK').catch(() => {})
       console.error('[insertArticle]', err)
       if (err.code === '23503') {
-        return res.status(400).json({ code: 400, message: '分组或封面文件不存在', data: null })
+        return fail(res, 400, '分组或封面文件不存在')
       }
       if (err.code === '22P02') {
-        return res.status(400).json({ code: 400, message: '附件 id 格式不正确', data: null })
+        return fail(res, 400, '附件 id 格式不正确')
       }
-      res.status(500).json({ code: 500, message: '数据库插入错误', data: null })
+      fail(res, 500, '数据库插入错误')
     } finally {
       client.release()
     }
@@ -262,10 +263,10 @@ const articleController = {
   //编辑文章
   updateArticle: async (req, res) => {
     const { id } = req.body
-    if (!id) return res.status(400).json({ code: 400, message: '文章 id 不能为空', data: null })
+    if (!id) return fail(res, 400, '文章 id 不能为空')
 
     const errMsg = validateArticleBody(req.body)
-    if (errMsg) return res.status(400).json({ code: 400, message: errMsg, data: null })
+    if (errMsg) return fail(res, 400, errMsg)
 
     const { title, introduce, content, subset_id } = req.body
     const state = req.body.state === true
@@ -298,25 +299,23 @@ const articleController = {
 
       if (result.rowCount === 0) {
         await client.query('ROLLBACK')
-        return res
-          .status(404)
-          .json({ code: 404, message: '文章不存在或不属于当前用户', data: null })
+        return fail(res, 404, '文章不存在或不属于当前用户')
       }
 
       await attachFiles(client, id, attachment_ids)
       await client.query('COMMIT')
 
-      res.status(200).json({ code: 200, message: '文章更新成功', data: { id } })
+      ok(res, { id }, '文章更新成功')
     } catch (err) {
       await client.query('ROLLBACK').catch(() => {})
       console.error('[updateArticle]', err)
       if (err.code === '23503') {
-        return res.status(400).json({ code: 400, message: '分组或封面文件不存在', data: null })
+        return fail(res, 400, '分组或封面文件不存在')
       }
       if (err.code === '22P02') {
-        return res.status(400).json({ code: 400, message: '附件 id 格式不正确', data: null })
+        return fail(res, 400, '附件 id 格式不正确')
       }
-      res.status(500).json({ code: 500, message: '数据库更新错误', data: null })
+      fail(res, 500, '数据库更新错误')
     } finally {
       client.release()
     }

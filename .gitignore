@@ -2,3 +2,4 @@ node_modules/
 data/
 dashijianSQL/
 scripts/smoke.mjs
+fetch.js

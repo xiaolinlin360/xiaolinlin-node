@@ -1,5 +1,6 @@
 import pool from '../../model/db.js'
 import crypto from 'node:crypto'
+import { ok, fail } from '../../lib/respond.js'
 
 const noteController = {
   // 1. 获取笔记（分页查询，支持 subset_id 及 id 过滤）
@@ -31,10 +32,7 @@ const noteController = {
 
       // 传了空数组 / 空字符串 / 全是逗号，直接返回空结果
       if (ids.length === 0) {
-        return res.status(200).json({
-          data: { notes: [], pageSize, pageNum },
-          code: 200,
-        })
+        return ok(res, { notes: [], pageSize, pageNum })
       }
 
       queryParams.push(ids)
@@ -58,14 +56,10 @@ const noteController = {
     // 执行查询
     pool.query(_sql, queryParams, (err, result) => {
       if (err) {
-        console.error(err)
-        res.status(500).json({ data: { message: '数据库查询错误' }, code: 500 })
-      } else {
-        res.status(200).json({
-          data: { notes: result.rows, pageSize, pageNum },
-          code: 200,
-        })
+        console.error('[getNotes]', err)
+        return fail(res, 500, '数据库查询错误')
       }
+      ok(res, { notes: result.rows, pageSize, pageNum })
     })
   },
 
@@ -86,7 +80,7 @@ const noteController = {
     if (note_ids !== undefined && note_ids !== null && note_ids !== '') {
       let ids = Array.isArray(note_ids) ? note_ids : [note_ids]
       if (ids.length === 0) {
-        return res.status(200).json({ data: { total: 0 }, code: 200 })
+        return ok(res, { total: 0 })
       }
       queryParams.push(ids)
       whereClauses.push(`id = ANY($${queryParams.length}::uuid[])`)
@@ -98,11 +92,10 @@ const noteController = {
 
     pool.query(_sql, queryParams, (err, result) => {
       if (err) {
-        console.error(err)
-        res.status(500).json({ data: { message: '数据库查询错误' }, code: 500 })
-      } else {
-        res.status(200).json({ data: { total: result.rows[0].total }, code: 200 })
+        console.error('[getTotalNotes]', err)
+        return fail(res, 500, '数据库查询错误')
       }
+      ok(res, { total: result.rows[0].total })
     })
   },
 
@@ -110,9 +103,9 @@ const noteController = {
   insertNotes: async (req, res) => {
     const { title, content, subset_id } = req.body
 
-    // 基础校验（根据截图，title 和 content 是必填的）
+    // 基础校验：title 和 content 都是必填
     if (!title || !content) {
-      return res.status(400).json({ data: { message: '标题和内容不能为空' }, code: 400 })
+      return fail(res, 400, '标题和内容不能为空')
     }
 
     // 生成 UUID
@@ -128,10 +121,10 @@ const noteController = {
 
     try {
       const result = await pool.query(_sql, params)
-      res.status(200).json({ data: result.rows[0], code: 200 })
+      ok(res, result.rows[0], '笔记创建成功')
     } catch (err) {
-      console.error('笔记创建失败:', err)
-      res.status(500).json({ data: { message: '数据库插入错误' }, code: 500 })
+      console.error('[insertNotes]', err)
+      fail(res, 500, '数据库插入错误')
     }
   },
 
@@ -140,7 +133,7 @@ const noteController = {
     const { id, title, content, subset_id } = req.body
 
     if (!id) {
-      return res.status(400).json({ data: { message: '缺少笔记ID' }, code: 400 })
+      return fail(res, 400, '缺少笔记ID')
     }
 
     // 动态拼接 SQL（只更新前端传过来的字段）
@@ -162,7 +155,7 @@ const noteController = {
     }
 
     if (updateFields.length === 0) {
-      return res.status(400).json({ data: { message: '没有提供需要更新的字段' }, code: 400 })
+      return fail(res, 400, '没有提供需要更新的字段')
     }
 
     // 把 id 放到参数数组最后
@@ -177,13 +170,13 @@ const noteController = {
     try {
       const result = await pool.query(_sql, params)
       if (result.rowCount > 0) {
-        res.status(200).json({ data: result.rows[0], code: 200 })
+        ok(res, result.rows[0], '笔记更新成功')
       } else {
-        res.status(404).json({ data: { message: '笔记不存在或已被删除' }, code: 404 })
+        fail(res, 404, '笔记不存在或已被删除')
       }
     } catch (err) {
-      console.error('笔记更新失败:', err)
-      res.status(500).json({ data: { message: '数据库更新错误' }, code: 500 })
+      console.error('[updateNotes]', err)
+      fail(res, 500, '数据库更新错误')
     }
   },
 
@@ -192,7 +185,7 @@ const noteController = {
     const { id } = req.body
 
     if (!id) {
-      return res.status(400).json({ data: { message: '缺少笔记ID' }, code: 400 })
+      return fail(res, 400, '缺少笔记ID')
     }
 
     const _sql = 'DELETE FROM notes WHERE id = $1 RETURNING id'
@@ -200,13 +193,13 @@ const noteController = {
     try {
       const result = await pool.query(_sql, [id])
       if (result.rowCount > 0) {
-        res.status(200).json({ data: { message: '删除成功' }, code: 200 })
+        ok(res, null, '笔记删除成功')
       } else {
-        res.status(404).json({ data: { message: '笔记不存在或已被删除' }, code: 404 })
+        fail(res, 404, '笔记不存在或已被删除')
       }
     } catch (err) {
-      console.error('笔记删除失败:', err)
-      res.status(500).json({ data: { message: '数据库删除错误' }, code: 500 })
+      console.error('[deleteNotes]', err)
+      fail(res, 500, '数据库删除错误')
     }
   },
 }

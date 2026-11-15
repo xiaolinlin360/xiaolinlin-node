@@ -1,4 +1,5 @@
 import pool from '../../model/db.js'
+import { ok, fail } from '../../lib/respond.js'
 
 const messageController = {
   //获取私信message
@@ -25,13 +26,10 @@ const messageController = {
   `
     pool.query(_sql, [user, pageSize, (pageNum - 1) * pageSize], (err, result) => {
       if (err) {
-        console.error(err)
-        return res.status(500).json({ data: { message: '数据库查询错误' }, code: 500 })
+        console.error('[getMessage]', err)
+        return fail(res, 500, '数据库查询错误')
       }
-      res.status(200).json({
-        data: { messages: result.rows, pageSize, pageNum },
-        code: 200,
-      })
+      ok(res, { messages: result.rows, pageSize, pageNum })
     })
   },
   //获取私信总数
@@ -41,12 +39,10 @@ const messageController = {
     let _sql = 'SELECT COUNT(*) AS total FROM messages WHERE receiver_user_id = $1;'
     pool.query(_sql, [user], (err, result) => {
       if (err) {
-        console.error(err)
-        res.status(500).json({ data: { message: '数据库查询错误' }, code: 500 })
-      } else {
-        const total = Number(result.rows[0].total)
-        res.status(200).json({ data: { total: total }, code: 200 })
+        console.error('[getTotalMessage]', err)
+        return fail(res, 500, '数据库查询错误')
       }
+      ok(res, { total: Number(result.rows[0].total) })
     })
   },
   //将某一条私信标记为已读
@@ -57,18 +53,14 @@ const messageController = {
       'UPDATE messages SET is_read = $1 WHERE receiver_user_id = $2 and id = $3 and is_read = $4;'
     pool.query(_sql, [true, user, data.id, false], (err, result) => {
       if (err) {
-        console.error(err)
-        res.status(500).json({ data: { message: '数据库更新错误' }, code: 500 })
+        console.error('[readMessage]', err)
+        return fail(res, 500, '数据库更新错误')
+      }
+      // 幂等：已经读过也返回 200，只是 is_read 还是 false
+      if (result.rowCount > 0) {
+        ok(res, { is_read: true }, '私信标记为已读成功')
       } else {
-        if (result.rowCount > 0) {
-          res
-            .status(200)
-            .json({ data: { message: '私信标记为已读成功', is_read: true }, code: 200 })
-        } else {
-          res
-            .status(200)
-            .json({ data: { message: '私信不存在或已被标记', is_read: false }, code: 200 })
-        }
+        ok(res, { is_read: false }, '私信不存在或已被标记')
       }
     })
   },
