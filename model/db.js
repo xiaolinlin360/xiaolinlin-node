@@ -8,7 +8,7 @@ const dbTables = {
   users: `
     CREATE TABLE IF NOT EXISTS users (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid (),
-        name TEXT NOT NULL,
+        name TEXT NOT NULL UNIQUE,
         email TEXT UNIQUE,
         phone VARCHAR(20) UNIQUE, -- 手机号，带国家码，如 8613800138000
         password TEXT NOT NULL,

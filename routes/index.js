@@ -1,5 +1,5 @@
 import serve from '../controller/serve.js'
-import { auth } from '../lib/auth.js'
+import { auth, requireAdmin } from '../lib/auth.js'
 import { rateLimit } from '../lib/rateLimit.js'
 // 上传配置在 config/data.js 里统一维护（存储目录、文件名清洗、大小限制）
 import { upload } from '../config/data.js'
@@ -57,6 +57,27 @@ export const getProfile = (app) => {
 export const updateProfile = (app) => {
   app.post('/user/updateProfile', auth, (req, res) => {
     serve.updateProfile(req, res)
+  })
+}
+
+//获取用户列表（用户管理页）
+export const getUsers = (app) => {
+  app.post('/user/getUsers', auth, (req, res) => {
+    serve.getUsers(req, res)
+  })
+}
+
+//添加用户（仅最高权限）
+export const addUser = (app) => {
+  app.post('/user/addUser', auth, requireAdmin, (req, res) => {
+    serve.addUser(req, res)
+  })
+}
+
+//修改某个用户的权限（仅最高权限）
+export const updatePermission = (app) => {
+  app.post('/user/updatePermission', auth, requireAdmin, (req, res) => {
+    serve.updatePermission(req, res)
   })
 }
 

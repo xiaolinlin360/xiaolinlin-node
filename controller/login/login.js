@@ -90,9 +90,76 @@ const loginController = {
     pool.query(_sql, [name, imgurl, req.user.id], (err, result) => {
       if (err) {
         console.error('[updateProfile]', err)
+        if (err.code === '23505') return fail(res, 409, '这个名称已被使用')
         return fail(res, 500, '数据库更新错误')
       }
       ok(res, result.rows[0], '保存成功')
+    })
+  },
+
+  //获取用户列表（用户管理页）
+  getUsers: (req, res) => {
+    let _sql =
+      'SELECT id, name, email, phone, permission, imgurl, created_at FROM users ORDER BY permission, created_at;'
+
+    pool.query(_sql, (err, result) => {
+      if (err) {
+        console.error('[getUsers]', err)
+        return fail(res, 500, '数据库查询错误')
+      }
+      ok(res, result.rows)
+    })
+  },
+
+  //添加用户（仅 0 级能调）
+  addUser: (req, res) => {
+    const name = (req.body.name || '').trim()
+    const email = (req.body.email || '').trim()
+    const password = req.body.password || ''
+    const phone = req.body.phone || null
+    const permission = Number(req.body.permission ?? 1)
+
+    if (!name) return fail(res, 400, '名称不能为空')
+    if (name.length > 20) return fail(res, 400, '名称不能超过 20 个字')
+    if (!email) return fail(res, 400, '邮箱不能为空')
+    if (!password) return fail(res, 400, '密码不能为空')
+
+    let _sql = `
+      INSERT INTO users (name, email, phone, password, permission)
+      VALUES ($1, $2, $3, $4, $5)
+      RETURNING id, name, email, phone, permission, created_at;
+    `
+
+    pool.query(_sql, [name, email, phone, password, permission], (err, result) => {
+      if (err) {
+        console.error('[addUser]', err)
+        if (err.code === '23505') return fail(res, 409, '名称、邮箱或手机号已被使用')
+        return fail(res, 500, '数据库插入错误')
+      }
+      ok(res, result.rows[0], '添加成功')
+    })
+  },
+
+  //修改某个用户的权限（仅 0 级能调，且不能改自己）
+  updatePermission: (req, res) => {
+    const { id } = req.body
+    const permission = Number(req.body.permission)
+
+    if (!id) return fail(res, 400, '用户 id 不能为空')
+    if (!Number.isInteger(permission) || permission < 0) {
+      return fail(res, 400, '权限值必须是不小于 0 的整数')
+    }
+    if (id === req.user.id) return fail(res, 400, '不能修改自己的权限')
+
+    let _sql = 'UPDATE users SET permission = $1 WHERE id = $2 RETURNING id, name, permission;'
+
+    pool.query(_sql, [permission, id], (err, result) => {
+      if (err) {
+        console.error('[updatePermission]', err)
+        return fail(res, 500, '数据库更新错误')
+      }
+      if (result.rowCount === 0) return fail(res, 404, '用户不存在')
+      ok(res, result.rows[0], '权限已更新')
     })
   },
 }

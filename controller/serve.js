@@ -21,6 +21,9 @@ const serve = {
   insertUser: loginController.insertUser,
   getProfile: loginController.getProfile,
   updateProfile: loginController.updateProfile,
+  getUsers: loginController.getUsers,
+  addUser: loginController.addUser,
+  updatePermission: loginController.updatePermission,
   //留言板
   getGuestbook: guestbookController.getGuestbook,
   getTotalGuestbook: guestbookController.getTotalGuestbook,
