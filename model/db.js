@@ -11,8 +11,7 @@ const dbTables = {
         name TEXT NOT NULL UNIQUE,
         email TEXT UNIQUE,
         phone VARCHAR(20) UNIQUE, -- 手机号，带国家码，如 8613800138000
-        password TEXT NOT NULL, -- argon2id 哈希（自带盐）；历史数据可能是加盐 md5 或明文，登录时自动升级
-        salt VARCHAR(32), -- 仅历史 md5 数据用；argon2 不需要，登录升级后会置空
+        password TEXT NOT NULL, -- argon2id 哈希，盐已经包含在哈希串里
         imgurl VARCHAR(255) DEFAULT '', -- 头像路径
         permission SMALLINT NOT NULL DEFAULT 1, -- 权限等级：数字越小权限越大，0 为最高
         is_deleted bool NOT NULL DEFAULT FALSE, -- 是否删除(默认未删除false)

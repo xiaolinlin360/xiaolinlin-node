@@ -295,7 +295,7 @@ const loginController = {
 
     try {
       const code = createCode(req.user.id, channel, target)
-      await sendCode(channel, target, code)
+      await sendCode(channel, target, code, '更换绑定')
 
       const isDev = process.env.NODE_ENV !== 'production'
       ok(
