@@ -102,6 +102,20 @@ export const resetPasswordByCode = (app) => {
   })
 }
 
+//发送更换绑定的验证码（发到新邮箱/新手机）
+export const sendContactCode = (app) => {
+  app.post('/user/sendContactCode', auth, (req, res) => {
+    serve.sendContactCode(req, res)
+  })
+}
+
+//更换邮箱 / 更换手机号
+export const updateContact = (app) => {
+  app.post('/user/updateContact', auth, (req, res) => {
+    serve.updateContact(req, res)
+  })
+}
+
 //获取留言（公开：访客也要能看）
 export const getGuestbook = (app) => {
   app.post('/guestbooks/getGuestbook', (req, res) => {
