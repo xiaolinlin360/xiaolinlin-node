@@ -87,18 +87,28 @@ const loginController = {
       fail(res, 500, '数据库查询错误')
     }
   },
-  //获取个人信息
+  //获取个人信息：带 token 就是自己的；没带就默认站点主人（前台首页要用）
   getProfile: (req, res) => {
-    let _sql =
-      'SELECT id, name, email, phone, permission, imgurl, created_at FROM users WHERE id = $1;'
+    const _sql = `
+      SELECT id, name, email, phone, permission, imgurl, created_at
+      FROM users
+      WHERE id = COALESCE($1::uuid, (SELECT id FROM users WHERE permission = 0 ORDER BY created_at LIMIT 1));
+    `
 
-    pool.query(_sql, [req.user.id], (err, result) => {
+    pool.query(_sql, [req.user?.id ?? null], (err, result) => {
       if (err) {
         console.error('[getProfile]', err)
         return fail(res, 500, '数据库查询错误')
       }
       if (result.rows.length === 0) return fail(res, 404, '用户不存在')
-      ok(res, result.rows[0])
+
+      const profile = result.rows[0]
+      // 游客只看名字和头像，手机号、邮箱别往外发
+      if (!req.user) {
+        delete profile.email
+        delete profile.phone
+      }
+      ok(res, profile)
     })
   },
 

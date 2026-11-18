@@ -16,11 +16,14 @@ const articleController = {
 
     const subsetId = data.subset_id && data.subset_id !== '' ? data.subset_id : null
 
+    // 前台访客（没登录）只能看已发布的，草稿别漏出去
+    const stateSql = req.user ? '' : ' AND state = true'
+
     const sql = `
     WITH paged AS (
       SELECT *
       FROM articles
-      WHERE ($3::uuid IS NULL OR subset_id = $3::uuid)
+      WHERE ($3::uuid IS NULL OR subset_id = $3::uuid)${stateSql}
       ORDER BY created_at DESC
       LIMIT $1 OFFSET $2
     )
@@ -74,9 +77,10 @@ const articleController = {
   //获取文章总数
   getTotalArticle: (req, res) => {
     const subset_id = req.body?.subset_id
+    const stateSql = req.user ? '' : ' AND state = true'
     const _sql = subset_id
-      ? 'SELECT COUNT(*)::int AS total FROM articles WHERE subset_id = $1;'
-      : 'SELECT COUNT(*)::int AS total FROM articles;'
+      ? `SELECT COUNT(*)::int AS total FROM articles WHERE subset_id = $1${stateSql};`
+      : `SELECT COUNT(*)::int AS total FROM articles WHERE TRUE${stateSql};`
     pool.query(_sql, subset_id ? [subset_id] : [], (err, result) => {
       if (err) {
         console.error('[getTotalArticle]', err)
@@ -177,7 +181,7 @@ const articleController = {
         JOIN labels l ON l.id = al.label_id
         WHERE al.article_id = a.id
       ) tl ON TRUE
-      WHERE a.id = $1;
+      WHERE a.id = $1${req.user ? '' : ' AND a.state = true'};
     `
 
     pool.query(_sql, [id], (err, result) => {

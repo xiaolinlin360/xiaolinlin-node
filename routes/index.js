@@ -1,5 +1,6 @@
 import serve from '../controller/serve.js'
-import { auth, requireAdmin } from '../lib/auth.js'
+import { auth, authOptional, requireAdmin } from '../lib/auth.js'
+import { siteGuard } from '../lib/siteGuard.js'
 import { rateLimit } from '../lib/rateLimit.js'
 // 上传配置在 config/data.js 里统一维护（存储目录、文件名清洗、大小限制）
 import { upload } from '../config/data.js'
@@ -48,7 +49,7 @@ export const login = (app) => {
 
 //获取个人信息
 export const getProfile = (app) => {
-  app.post('/user/getProfile', auth, (req, res) => {
+  app.post('/user/getProfile', authOptional, siteGuard, (req, res) => {
     serve.getProfile(req, res)
   })
 }
@@ -62,7 +63,7 @@ export const updateProfile = (app) => {
 
 //获取用户列表（用户管理页）
 export const getUsers = (app) => {
-  app.post('/user/getUsers', auth, (req, res) => {
+  app.post('/user/getUsers', auth, requireAdmin, (req, res) => {
     serve.getUsers(req, res)
   })
 }
@@ -167,21 +168,21 @@ export const readMessage = (app) => {
 
 //获取文章
 export const getArticle = (app) => {
-  app.post('/article/getArticle', auth, (req, res) => {
+  app.post('/article/getArticle', authOptional, siteGuard, (req, res) => {
     serve.getArticle(req, res)
   })
 }
 
 //获取文章总数
 export const getTotalArticle = (app) => {
-  app.post('/article/getTotalArticle', auth, (req, res) => {
+  app.post('/article/getTotalArticle', authOptional, siteGuard, (req, res) => {
     serve.getTotalArticle(req, res)
   })
 }
 
 //获取文章详情（编辑回显）
 export const getArticleDetail = (app) => {
-  app.post('/article/getArticleDetail', auth, (req, res) => {
+  app.post('/article/getArticleDetail', authOptional, siteGuard, (req, res) => {
     serve.getArticleDetail(req, res)
   })
 }
@@ -216,13 +217,13 @@ export const deleteArticle = (app) => {
 
 //获取分组分类
 export const getCategory = (app) => {
-  app.post('/subsets/getCategory', auth, (req, res) => {
+  app.post('/subsets/getCategory', authOptional, siteGuard, (req, res) => {
     serve.getCategory(req, res)
   })
 }
 //获取分组
 export const getSubset = (app) => {
-  app.post('/subsets/getSubset', auth, (req, res) => {
+  app.post('/subsets/getSubset', authOptional, siteGuard, (req, res) => {
     serve.getSubset(req, res)
   })
 }
@@ -250,7 +251,7 @@ export const deleteSubset = (app) => {
 
 //获取标签
 export const getLabels = (app) => {
-  app.post('/labels/getLabels', auth, (req, res) => {
+  app.post('/labels/getLabels', authOptional, siteGuard, (req, res) => {
     serve.getLabels(req, res)
   })
 }
@@ -328,19 +329,19 @@ export const uploadFile = (app) => {
 
 //画廊
 export const getGallery = (app) => {
-  app.post('/gallerys/getGallery', auth, (req, res) => {
+  app.post('/gallerys/getGallery', authOptional, siteGuard, (req, res) => {
     serve.getGallery(req, res)
   })
 }
 //获取画廊总数
 export const getTotalGallery = (app) => {
-  app.post('/gallerys/getTotalGallery', auth, (req, res) => {
+  app.post('/gallerys/getTotalGallery', authOptional, siteGuard, (req, res) => {
     serve.getTotalGallery(req, res)
   })
 }
 //获取图库详情（编辑回显）
 export const getGalleryDetail = (app) => {
-  app.post('/gallerys/getGalleryDetail', auth, (req, res) => {
+  app.post('/gallerys/getGalleryDetail', authOptional, siteGuard, (req, res) => {
     serve.getGalleryDetail(req, res)
   })
 }
@@ -366,13 +367,13 @@ export const deleteGallery = (app) => {
 //笔记
 //获取笔记（分页查询）
 export const getNotes = (app) => {
-  app.post('/notes/getNotes', auth, (req, res) => {
+  app.post('/notes/getNotes', authOptional, siteGuard, (req, res) => {
     serve.getNotes(req, res)
   })
 }
 //获取笔记总数
 export const getTotalNotes = (app) => {
-  app.post('/notes/getTotalNotes', auth, (req, res) => {
+  app.post('/notes/getTotalNotes', authOptional, siteGuard, (req, res) => {
     serve.getTotalNotes(req, res)
   })
 }
@@ -401,3 +402,4 @@ export const v3pz = (app) => {
     serve.v3pz(req, res)
   })
 }
+

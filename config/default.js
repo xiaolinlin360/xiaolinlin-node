@@ -1,5 +1,9 @@
 export const config = {
   port: 3001,
+  // 公开接口（前台访客用）允许哪些域名来调，上线后把真域名加进来
+  site: {
+    allowedHosts: ['localhost', '127.0.0.1'],
+  },
   database: {
     host: 'localhost',
     user: 'postgres',
