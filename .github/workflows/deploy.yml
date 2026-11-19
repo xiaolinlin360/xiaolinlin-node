@@ -25,8 +25,8 @@ jobs:
             export NVM_DIR="$HOME/.nvm"
             [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 
-            # 2. 进入项目目录（注意：目录名是 my-blog）
-            cd /home/ubuntu/my-blog
+            # 2. 进入项目目录（注意：目录名是 xiaolinlin-node）
+            cd /home/ubuntu/my-node
 
             # 3. 拉取最新代码
             git pull origin main
@@ -34,6 +34,5 @@ jobs:
             # 4. 安装依赖
             pnpm install --frozen-lockfile
 
-            # 5. 重启 PM2 进程（注意：进程名是 my-blog）
-            # 先尝试 reload 实现平滑重启，如果进程不存在则执行 start
-            pm2 reload my-blog || pm2 start blog.js --name "my-blog"
+            # 5. 重启 PM2 进程（注意：进程名是 xiaolinlin-node）
+            pm2 reload xiaolinlin-node || pm2 start blog.js --name "xiaolinlin-node"
