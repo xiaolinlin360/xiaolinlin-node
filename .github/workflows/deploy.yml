@@ -3,7 +3,7 @@ name: 自动部署后端到腾讯云服务器
 on:
   push:
     branches:
-      - main # 只有推送到 main 分支时才触发
+      - main
 
 jobs:
   deploy:
@@ -21,18 +21,21 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           script: |
-            # 1. 加载 Node 环境 (非常重要！否则会报错找不到 pnpm 和 pm2)
+            # 1. 强制 Git 使用 HTTP/1.1 协议，规避 TLS 握手异常
+            git config --global http.version HTTP/1.1
+
+            # 2. 加载 nvm 环境，让 pnpm 和 pm2 命令可用
             export NVM_DIR="$HOME/.nvm"
             [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 
-            # 2. 进入你服务器上的后端项目目录
+            # 3. 进入项目目录
             cd /home/ubuntu/my-node
 
-            # 3. 拉取 GitHub 上的最新代码
+            # 4. 拉取最新代码
             git pull origin main
 
-            # 4. 安装依赖 (如果你用的是 npm，就把 pnpm 换成 npm)
+            # 5. 安装依赖
             pnpm install --frozen-lockfile
 
-            # 5. 重启 PM2 进程 (实现平滑重启)
+            # 6. 平滑重启 PM2 进程
             pm2 reload my-node
