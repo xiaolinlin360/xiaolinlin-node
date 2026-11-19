@@ -21,21 +21,12 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           script: |
-            # 1. 强制 Git 使用 HTTP/1.1 协议，规避 TLS 握手异常
-            git config --global http.version HTTP/1.1
+            # 1. 进入项目目录
+            cd /home/ubuntu/xiaolinlin-node
 
-            # 2. 加载 nvm 环境，让 pnpm 和 pm2 命令可用
-            export NVM_DIR="$HOME/.nvm"
-            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-
-            # 3. 进入项目目录
-            cd /home/ubuntu/my-node
-
-            # 4. 拉取最新代码
+            # 2. 拉取最新代码
             git pull origin main
 
-            # 5. 安装依赖
-            pnpm install --frozen-lockfile
-
-            # 6. 平滑重启 PM2 进程
-            pm2 reload my-node
+            # 3. 使用绝对路径执行命令
+            /home/ubuntu/.npm-global/bin/pnpm install --frozen-lockfile
+            /home/ubuntu/.npm-global/bin/pm2 reload xiaolinlin-node
