@@ -1,22 +1,38 @@
-name: Deploy to Tencent Cloud
+name: 自动部署后端到腾讯云服务器
 
 on:
   push:
     branches:
-      - main
+      - main # 只有推送到 main 分支时才触发
 
 jobs:
   deploy:
+    name: 🚀 部署工作
     runs-on: ubuntu-latest
+
     steps:
-      - name: SSH into server and deploy
+      - name: 📦 读取仓库内容
+        uses: actions/checkout@v4
+
+      - name: 🔗 SSH 连接服务器并执行更新
         uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           script: |
+            # 1. 加载 Node 环境 (非常重要！否则会报错找不到 pnpm 和 pm2)
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+
+            # 2. 进入你服务器上的后端项目目录
             cd /home/ubuntu/my-node
+
+            # 3. 拉取 GitHub 上的最新代码
             git pull origin main
+
+            # 4. 安装依赖 (如果你用的是 npm，就把 pnpm 换成 npm)
             pnpm install --frozen-lockfile
+
+            # 5. 重启 PM2 进程 (实现平滑重启)
             pm2 reload my-node
