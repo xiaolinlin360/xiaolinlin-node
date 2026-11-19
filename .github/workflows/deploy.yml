@@ -21,12 +21,19 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           script: |
-            # 1. 进入项目目录
-            cd /home/ubuntu/xiaolinlin-node
+            # 1. 加载 nvm 环境，让 node/pnpm/pm2 命令在非交互式 Shell 中也生效
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 
-            # 2. 拉取最新代码
+            # 2. 进入项目目录（注意：目录名是 my-blog）
+            cd /home/ubuntu/my-blog
+
+            # 3. 拉取最新代码
             git pull origin main
 
-            # 3. 使用绝对路径执行命令
-            /home/ubuntu/.npm-global/bin/pnpm install --frozen-lockfile
-            /home/ubuntu/.npm-global/bin/pm2 reload xiaolinlin-node
+            # 4. 安装依赖
+            pnpm install --frozen-lockfile
+
+            # 5. 重启 PM2 进程（注意：进程名是 my-blog）
+            # 先尝试 reload 实现平滑重启，如果进程不存在则执行 start
+            pm2 reload my-blog || pm2 start blog.js --name "my-blog"
