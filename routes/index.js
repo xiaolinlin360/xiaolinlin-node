@@ -201,6 +201,13 @@ export const praiseArticle = (app) => {
   })
 }
 
+//取消收藏 -1（点错了能撤回）
+export const offPraiseArticle = (app) => {
+  app.post('/article/offPraise', authOptional, siteGuard, (req, res) => {
+    serve.offPraiseArticle(req, res)
+  })
+}
+
 //新建文章
 export const insertArticle = (app) => {
   app.post('/article/insertArticle', auth, (req, res) => {

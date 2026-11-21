@@ -44,6 +44,7 @@ const serve = {
   getArticleDetail: articleController.getArticleDetail,
   addView: articleController.addView,
   praiseArticle: articleController.praise,
+  offPraiseArticle: articleController.offPraise,
   insertArticle: articleController.insertArticle,
   updateArticle: articleController.updateArticle,
   updateArticleStatus: articleController.updateArticleStatus,

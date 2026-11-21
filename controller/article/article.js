@@ -159,6 +159,25 @@ const articleController = {
     })
   },
 
+  // 取消收藏 -1：跟 praise 对称，点错了能撤回
+  offPraise: (req, res) => {
+    const { id } = req.body
+    if (!id) return fail(res, 400, '文章 id 不能为空')
+
+    // GREATEST 兜一下，别让数字减成负数
+    const _sql =
+      'UPDATE articles SET praise_count = GREATEST(praise_count - 1, 0) WHERE id = $1 AND state = true RETURNING praise_count;'
+    pool.query(_sql, [id], (err, result) => {
+      if (err) {
+        console.error('[offPraise]', err)
+        if (err.code === '22P02') return fail(res, 400, '文章 id 格式不正确')
+        return fail(res, 500, '数据库更新错误')
+      }
+      if (result.rows.length === 0) return fail(res, 404, '文章不存在或未发布')
+      ok(res, { praise_count: result.rows[0].praise_count })
+    })
+  },
+
   //获取文章详情（编辑回显 + 前台详情页共用）
   getArticleDetail: (req, res) => {
     const { id } = req.body
