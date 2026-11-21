@@ -194,6 +194,13 @@ export const addView = (app) => {
   })
 }
 
+//文章收藏 +1（匿名也能点，防重复靠前端 localStorage）
+export const praiseArticle = (app) => {
+  app.post('/article/praise', authOptional, siteGuard, (req, res) => {
+    serve.praiseArticle(req, res)
+  })
+}
+
 //新建文章
 export const insertArticle = (app) => {
   app.post('/article/insertArticle', auth, (req, res) => {

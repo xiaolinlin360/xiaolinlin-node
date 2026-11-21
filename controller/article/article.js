@@ -141,6 +141,24 @@ const articleController = {
     })
   },
 
+  // 收藏 +1：前端用 localStorage 记「我收藏过哪些」，这里只管加数字
+  praise: (req, res) => {
+    const { id } = req.body
+    if (!id) return fail(res, 400, '文章 id 不能为空')
+
+    const _sql =
+      'UPDATE articles SET praise_count = praise_count + 1 WHERE id = $1 AND state = true RETURNING praise_count;'
+    pool.query(_sql, [id], (err, result) => {
+      if (err) {
+        console.error('[praise]', err)
+        if (err.code === '22P02') return fail(res, 400, '文章 id 格式不正确')
+        return fail(res, 500, '数据库更新错误')
+      }
+      if (result.rows.length === 0) return fail(res, 404, '文章不存在或未发布')
+      ok(res, { praise_count: result.rows[0].praise_count })
+    })
+  },
+
   //获取文章详情（编辑回显 + 前台详情页共用）
   getArticleDetail: (req, res) => {
     const { id } = req.body
@@ -153,8 +171,7 @@ const articleController = {
         f.url  AS url,
         COALESCE(tf.file_urls,  '[]'::json) AS file_urls,
         COALESCE(ta.attachments,'[]'::json) AS attachments,
-        COALESCE(tl.labels,     '[]'::json) AS labels,
-        tp.praise_count
+        COALESCE(tl.labels,     '[]'::json) AS labels
       FROM articles a
       LEFT JOIN users u ON u.id = a.user_id
       LEFT JOIN files f ON f.id = a.cover_file_id
@@ -186,10 +203,6 @@ const articleController = {
         JOIN labels l ON l.id = al.label_id
         WHERE al.article_id = a.id
       ) tl ON TRUE
-      -- 点赞（收藏）数：praise 表里这个文章有几条
-      LEFT JOIN LATERAL (
-        SELECT COUNT(*)::int AS praise_count FROM praise p WHERE p.article_id = a.id
-      ) tp ON TRUE
       WHERE a.id = $1${req.user ? '' : ' AND a.state = true'};
     `
 

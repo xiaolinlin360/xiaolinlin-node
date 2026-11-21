@@ -90,6 +90,7 @@ const dbTables = {
         state bool NOT NULL DEFAULT FALSE, -- 状态(是否发布,默认不发布false)
         content TEXT NOT NULL, -- 内容
         views INTEGER NOT NULL DEFAULT 0, -- 浏览量
+        praise_count INTEGER NOT NULL DEFAULT 0, -- 收藏（点赞）数
         created_at TIMESTAMP DEFAULT NOW(),
         CONSTRAINT fk_articles_user_id_to_users_id FOREIGN KEY (user_id) REFERENCES users (id),
         CONSTRAINT fk_articles_subset_id_to_subsets_id FOREIGN KEY (subset_id) REFERENCES subsets (id),
@@ -114,17 +115,6 @@ const dbTables = {
         created_at TIMESTAMP DEFAULT NOW(),
         CONSTRAINT fk_article_label_article_id_to_articles_id FOREIGN KEY (article_id) REFERENCES articles (id) ON DELETE CASCADE,
         CONSTRAINT fk_article_label_label_id_to_labels_id FOREIGN KEY (label_id) REFERENCES labels (id)
-    );
-  `,
-
-  praise: `
-    CREATE TABLE IF NOT EXISTS praise (
-        PRIMARY KEY (user_id, article_id), -- 主键(用户id,文章id)
-        user_id UUID NOT NULL,
-        article_id UUID NOT NULL,
-        created_at TIMESTAMP DEFAULT NOW(),
-        CONSTRAINT fk_praise_user_id_to_users_id FOREIGN KEY (user_id) REFERENCES users (id),
-        CONSTRAINT fk_praise_article_id_to_articles_id FOREIGN KEY (article_id) REFERENCES articles (id) ON DELETE CASCADE 
     );
   `,
 
