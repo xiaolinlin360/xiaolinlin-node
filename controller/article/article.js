@@ -14,7 +14,10 @@ const articleController = {
     if (pageSize < 1) pageSize = 10
     if (pageSize > 100) pageSize = 100
 
-    const subsetId = data.subset_id && data.subset_id !== '' ? data.subset_id : null
+    // top = 页面上选的那个分类（其实就是子分类 id）；
+    // subset_id 是历史写法，两个都认，前端统一用 top
+    const top = data.top ?? data.subset_id
+    const subsetId = top && top !== '' ? top : null
 
     // 前台访客（没登录）只能看已发布的，草稿别漏出去
     const stateSql = req.user ? '' : ' AND state = true'
@@ -76,7 +79,8 @@ const articleController = {
   },
   //获取文章总数
   getTotalArticle: (req, res) => {
-    const subset_id = req.body?.subset_id
+    const top = req.body?.top ?? req.body?.subset_id
+    const subset_id = top && top !== '' ? top : null
     const stateSql = req.user ? '' : ' AND state = true'
     const _sql = subset_id
       ? `SELECT COUNT(*)::int AS total FROM articles WHERE subset_id = $1${stateSql};`
@@ -137,7 +141,7 @@ const articleController = {
     })
   },
 
-  //获取文章详情（编辑回显用）
+  //获取文章详情（编辑回显 + 前台详情页共用）
   getArticleDetail: (req, res) => {
     const { id } = req.body
     if (!id) return fail(res, 400, '文章 id 不能为空')
@@ -149,7 +153,8 @@ const articleController = {
         f.url  AS url,
         COALESCE(tf.file_urls,  '[]'::json) AS file_urls,
         COALESCE(ta.attachments,'[]'::json) AS attachments,
-        COALESCE(tl.labels,     '[]'::json) AS labels
+        COALESCE(tl.labels,     '[]'::json) AS labels,
+        tp.praise_count
       FROM articles a
       LEFT JOIN users u ON u.id = a.user_id
       LEFT JOIN files f ON f.id = a.cover_file_id
@@ -181,6 +186,10 @@ const articleController = {
         JOIN labels l ON l.id = al.label_id
         WHERE al.article_id = a.id
       ) tl ON TRUE
+      -- 点赞（收藏）数：praise 表里这个文章有几条
+      LEFT JOIN LATERAL (
+        SELECT COUNT(*)::int AS praise_count FROM praise p WHERE p.article_id = a.id
+      ) tp ON TRUE
       WHERE a.id = $1${req.user ? '' : ' AND a.state = true'};
     `
 
@@ -197,6 +206,23 @@ const articleController = {
         return fail(res, 404, '文章不存在')
       }
       ok(res, result.rows[0])
+    })
+  },
+
+  // 浏览量 +1：打开详情页时调一次
+  addView: (req, res) => {
+    const { id } = req.body
+    if (!id) return fail(res, 400, '文章 id 不能为空')
+
+    const _sql = 'UPDATE articles SET views = views + 1 WHERE id = $1 AND state = true RETURNING views;'
+    pool.query(_sql, [id], (err, result) => {
+      if (err) {
+        console.error('[addView]', err)
+        if (err.code === '22P02') return fail(res, 400, '文章 id 格式不正确')
+        return fail(res, 500, '数据库更新错误')
+      }
+      if (result.rows.length === 0) return fail(res, 404, '文章不存在或未发布')
+      ok(res, { views: result.rows[0].views })
     })
   },
 

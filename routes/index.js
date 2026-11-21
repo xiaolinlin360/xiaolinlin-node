@@ -180,10 +180,17 @@ export const getTotalArticle = (app) => {
   })
 }
 
-//获取文章详情（编辑回显）
+//获取文章详情（编辑回显 + 前台详情页共用）
 export const getArticleDetail = (app) => {
   app.post('/article/getArticleDetail', authOptional, siteGuard, (req, res) => {
     serve.getArticleDetail(req, res)
+  })
+}
+
+//文章浏览量 +1（前台打开详情页时调一次）
+export const addView = (app) => {
+  app.post('/article/addView', authOptional, siteGuard, (req, res) => {
+    serve.addView(req, res)
   })
 }
 

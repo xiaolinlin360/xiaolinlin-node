@@ -42,6 +42,7 @@ const serve = {
   getArticle: articleController.getArticle,
   getTotalArticle: articleController.getTotalArticle,
   getArticleDetail: articleController.getArticleDetail,
+  addView: articleController.addView,
   insertArticle: articleController.insertArticle,
   updateArticle: articleController.updateArticle,
   updateArticleStatus: articleController.updateArticleStatus,

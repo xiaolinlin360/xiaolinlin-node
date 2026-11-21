@@ -89,6 +89,7 @@ const dbTables = {
         cover_file_id UUID, -- 封面文件id
         state bool NOT NULL DEFAULT FALSE, -- 状态(是否发布,默认不发布false)
         content TEXT NOT NULL, -- 内容
+        views INTEGER NOT NULL DEFAULT 0, -- 浏览量
         created_at TIMESTAMP DEFAULT NOW(),
         CONSTRAINT fk_articles_user_id_to_users_id FOREIGN KEY (user_id) REFERENCES users (id),
         CONSTRAINT fk_articles_subset_id_to_subsets_id FOREIGN KEY (subset_id) REFERENCES subsets (id),

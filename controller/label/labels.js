@@ -3,9 +3,14 @@ import { ok, fail } from '../../lib/respond.js'
 import { buildLabelsQuery } from './utils/buildLabelsQuery.js'
 
 const labelController = {
-  //获取所有标签
+  //获取所有标签（带每个标签的文章数）
   getLabels: async (req, res, next) => {
-    const { sql, values } = buildLabelsQuery(req.body?.keyword ?? req.query?.keyword)
+    // 没登录的就是前台，只数已发布的文章；登录了（后台）连草稿一起数
+    const hasUser = Boolean(req.user)
+    const { sql, values } = buildLabelsQuery(
+      req.body?.keyword ?? req.query?.keyword,
+      !hasUser,
+    )
     try {
       const { rows } = await pool.query(sql, values)
       ok(res, rows)
