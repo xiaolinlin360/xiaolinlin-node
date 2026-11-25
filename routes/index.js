@@ -117,9 +117,9 @@ export const updateContact = (app) => {
   })
 }
 
-//获取留言（公开：访客也要能看）
+//获取留言（公开：访客也要能看；带 token 的博主能看到 email）
 export const getGuestbook = (app) => {
-  app.post('/guestbooks/getGuestbook', (req, res) => {
+  app.post('/guestbooks/getGuestbook', authOptional, (req, res) => {
     serve.getGuestbook(req, res)
   })
 }

@@ -118,12 +118,13 @@ const dbTables = {
     );
   `,
 
-  // 全站留言板：匿名，只要「称呼 + 内容」，不关联用户也不关联文章
+  // 全站留言板：匿名，只要「称呼 + 内容（+ 可选邮箱）」，不关联用户也不关联文章
   guestbooks: `
     CREATE TABLE IF NOT EXISTS guestbooks (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid (),
         nickname VARCHAR(30) NOT NULL,  -- 称呼
         content VARCHAR(500) NOT NULL,  -- 留言内容
+        email VARCHAR(100),             -- 可选，不对外公开，博主回复时用
         created_at TIMESTAMP DEFAULT NOW()
     );
   `,

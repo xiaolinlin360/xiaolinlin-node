@@ -20,10 +20,19 @@ const guestbookController = {
         console.error('[getGuestbook]', err)
         return res.status(500).json({ code: 500, message: '数据库查询错误', data: null })
       }
+
+      // 邮箱是「可选，不公开」的：匿名访客一律看不到，只有登录的博主（权限 0）能看
+      const isOwner = req.user && req.user.permission === 0
+      const rows = result.rows.map((row) => {
+        if (isOwner) return row
+        const { email, ...rest } = row
+        return rest
+      })
+
       res.status(200).json({
         code: 200,
         message: 'ok',
-        data: { guestbooks: result.rows, pageNum, pageSize },
+        data: { guestbooks: rows, pageNum, pageSize },
       })
     })
   },
@@ -39,10 +48,11 @@ const guestbookController = {
     })
   },
 
-  // 发表留言（匿名：只要称呼 + 内容）
+  // 发表留言（匿名：称呼 + 内容，邮箱可选）
   insertGuestbook: (req, res) => {
     const nickname = (req.body.nickname || '').trim()
     const content = (req.body.content || '').trim()
+    const email = (req.body.email || '').trim()
 
     if (!nickname) {
       return res.status(400).json({ code: 400, message: '请填写你的称呼', data: null })
@@ -56,10 +66,15 @@ const guestbookController = {
     if (content.length > 500) {
       return res.status(400).json({ code: 400, message: '留言不能超过 500 个字', data: null })
     }
+    // 邮箱可以不填，填了就得像样
+    if (email && (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 100)) {
+      return res.status(400).json({ code: 400, message: '邮箱格式不对', data: null })
+    }
 
-    const _sql = 'INSERT INTO guestbooks (nickname, content) VALUES ($1, $2) RETURNING *;'
+    const _sql =
+      'INSERT INTO guestbooks (nickname, content, email) VALUES ($1, $2, $3) RETURNING id, nickname, content, created_at;'
 
-    pool.query(_sql, [nickname, content], (err, result) => {
+    pool.query(_sql, [nickname, content, email || null], (err, result) => {
       if (err) {
         console.error('[insertGuestbook]', err)
         return res.status(500).json({ code: 500, message: '数据库插入错误', data: null })
