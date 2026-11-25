@@ -138,6 +138,13 @@ export const insertGuestbook = (app) => {
   })
 }
 
+//回复留言（需要登录，只有博主能回）
+export const replyGuestbook = (app) => {
+  app.post('/guestbooks/reply', auth, requireAdmin, (req, res) => {
+    serve.replyGuestbook(req, res)
+  })
+}
+
 //删除留言（需要登录，只有博客主人能删）
 export const deleteGuestbook = (app) => {
   app.post('/guestbooks/deleteGuestbook', auth, (req, res) => {

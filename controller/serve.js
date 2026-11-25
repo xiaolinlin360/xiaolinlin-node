@@ -33,6 +33,7 @@ const serve = {
   getGuestbook: guestbookController.getGuestbook,
   getTotalGuestbook: guestbookController.getTotalGuestbook,
   insertGuestbook: guestbookController.insertGuestbook,
+  replyGuestbook: guestbookController.setReply,
   deleteGuestbook: guestbookController.deleteGuestbook,
   //消息
   getMessage: messageController.getMessage,

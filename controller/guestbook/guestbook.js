@@ -83,6 +83,42 @@ const guestbookController = {
     })
   },
 
+  // 回复留言（只有博主能回；reply 传空就是撤掉回复）
+  setReply: (req, res) => {
+    const { id } = req.body
+    const reply = (req.body.reply || '').trim()
+
+    if (!id) {
+      return res.status(400).json({ code: 400, message: '留言 id 不能为空', data: null })
+    }
+    if (reply.length > 500) {
+      return res.status(400).json({ code: 400, message: '回复不能超过 500 个字', data: null })
+    }
+
+    // 有内容就写回复并记时间，空字符串则把回复清掉
+    const _sql = reply
+      ? 'UPDATE guestbooks SET reply = $1, replied_at = NOW() WHERE id = $2 RETURNING id, reply, replied_at;'
+      : 'UPDATE guestbooks SET reply = NULL, replied_at = NULL WHERE id = $1 RETURNING id, reply, replied_at;'
+
+    pool.query(_sql, reply ? [reply, id] : [id], (err, result) => {
+      if (err) {
+        console.error('[setReply]', err)
+        if (err.code === '22P02') {
+          return res.status(400).json({ code: 400, message: '留言 id 格式不正确', data: null })
+        }
+        return res.status(500).json({ code: 500, message: '数据库更新错误', data: null })
+      }
+      if (result.rows.length === 0) {
+        return res.status(404).json({ code: 404, message: '留言不存在', data: null })
+      }
+      res.status(200).json({
+        code: 200,
+        message: reply ? '回复成功' : '回复已撤掉',
+        data: result.rows[0],
+      })
+    })
+  },
+
   // 删除留言（只有博客主人能删）
   deleteGuestbook: (req, res) => {
     const { id } = req.body

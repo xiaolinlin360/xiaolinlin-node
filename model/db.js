@@ -125,6 +125,8 @@ const dbTables = {
         nickname VARCHAR(30) NOT NULL,  -- 称呼
         content VARCHAR(500) NOT NULL,  -- 留言内容
         email VARCHAR(100),             -- 可选，不对外公开，博主回复时用
+        reply TEXT,                     -- 博主回复，一条留言配一条
+        replied_at TIMESTAMP,           -- 回复时间
         created_at TIMESTAMP DEFAULT NOW()
     );
   `,
