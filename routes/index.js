@@ -147,7 +147,7 @@ export const replyGuestbook = (app) => {
 
 //删除留言（需要登录，只有博客主人能删）
 export const deleteGuestbook = (app) => {
-  app.post('/guestbooks/deleteGuestbook', auth, (req, res) => {
+  app.post('/guestbooks/deleteGuestbook', auth, requireAdmin, (req, res) => {
     serve.deleteGuestbook(req, res)
   })
 }
