@@ -187,6 +187,13 @@ export const getTotalArticle = (app) => {
   })
 }
 
+//给文章设置标签（拖拽用：全量替换这一篇的标签）
+export const setArticleLabels = (app) => {
+  app.post('/article/setArticleLabels', auth, (req, res) => {
+    serve.setArticleLabels(req, res)
+  })
+}
+
 //获取文章详情（编辑回显 + 前台详情页共用）
 export const getArticleDetail = (app) => {
   app.post('/article/getArticleDetail', authOptional, siteGuard, (req, res) => {

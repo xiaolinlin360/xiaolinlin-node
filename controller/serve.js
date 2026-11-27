@@ -50,6 +50,7 @@ const serve = {
   updateArticle: articleController.updateArticle,
   updateArticleStatus: articleController.updateArticleStatus,
   deleteArticle: articleController.deleteArticle,
+  setArticleLabels: articleController.setArticleLabels,
   //子集
   getCategory: categoryController.getCategory, //获取分组分类
   getSubset: subsetController.getSubset,

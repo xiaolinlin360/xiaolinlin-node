@@ -180,6 +180,36 @@ const articleController = {
     })
   },
 
+  // 给文章设置标签（全量替换）
+  // 前端拖一个标签上来 → 把「这篇文章现有的 + 新拖的」整份提交，所以这里先删后插
+  setArticleLabels: async (req, res) => {
+    const { id, label_ids } = req.body
+    if (!id) return fail(res, 400, '文章 id 不能为空')
+
+    const ids = Array.isArray(label_ids) ? label_ids : []
+    const client = await pool.connect()
+
+    try {
+      await client.query('BEGIN')
+      await client.query('DELETE FROM article_label WHERE article_id = $1', [id])
+      if (ids.length > 0) {
+        await client.query(
+          'INSERT INTO article_label (article_id, label_id) SELECT $1, unnest($2::uuid[])',
+          [id, ids]
+        )
+      }
+      await client.query('COMMIT')
+      ok(res, { id, label_ids: ids }, '标签已更新')
+    } catch (err) {
+      await client.query('ROLLBACK')
+      if (err.code === '22P02') return fail(res, 400, 'id 格式不正确') // 传了不是 UUID 的 id
+      console.error('[setArticleLabels]', err)
+      fail(res, 500, '标签更新失败')
+    } finally {
+      client.release()
+    }
+  },
+
   //获取文章详情（编辑回显 + 前台详情页共用）
   getArticleDetail: (req, res) => {
     const { id } = req.body
