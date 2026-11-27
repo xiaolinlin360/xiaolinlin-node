@@ -36,6 +36,8 @@ const articleController = {
       a.title,
       a.content,
       a.user_id,
+      a.views,        -- 浏览量（前台每打开一次详情 +1）
+      a.praise_count, -- 收藏（点赞）数
       f.url AS url,               -- 通过 cover_file_id 拿到的封面 URL
       COALESCE(tf.file_urls, '[]'::json) AS file_urls, -- 聚合的文件ID数组或URL数组
       a.introduce,
